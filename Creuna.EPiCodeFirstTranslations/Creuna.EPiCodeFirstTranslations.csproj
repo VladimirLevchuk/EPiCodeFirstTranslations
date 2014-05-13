@@ -172,12 +172,18 @@
     <Compile Include="TranslationReader.cs" />
     <Compile Include="TranslationServiceBase.cs" />
     <Compile Include="TranslationsKeyMapper.cs" />
+    <Content Include="Creuna.BuildTools\NuGet.exe" />
+    <Content Include="Creuna.BuildTools\Readme.txt" />
     <Content Include="Translation\HtmlHelperExtentions.cs.pp" />
     <Content Include="Translation\Translations.cs.pp" />
     <Content Include="Translation\TranslationService.cs.pp" />
     <Content Include="Views\Web.config.transform" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Creuna.BuildTools\BuildAndPushNewPackage.ps1" />
+    <None Include="Creuna.BuildTools\New-NuGetPackage.ps1" />
+    <None Include="Creuna.BuildTools\SaveMsBuildParams.ps1" />
+    <None Include="Creuna.BuildTools\UpdateAssemblyVersion.ps1" />
     <None Include="Creuna.EPiCodeFirstTranslations.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
@@ -185,6 +191,9 @@
     <Folder Include="App_Start\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>PowerShell -NoProfile -ExecutionPolicy Bypass -Command "&amp; '$(ProjectDir)Creuna.BuildTools\SaveMsBuildParams.ps1' -ProjectFilePath '$(ProjectPath)' -OutputDirectory '$(TargetDir)' -Configuration '$(ConfigurationName)' -Platform '$(PlatformName)'"</PreBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
