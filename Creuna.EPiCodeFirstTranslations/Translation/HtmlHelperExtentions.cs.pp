@@ -16,7 +16,7 @@ namespace $rootnamespace$.Translation
 
         public static IHtmlString Translation(this HtmlHelper htmlHelper, Expression<Func<Translations, string>> translationPathExpression)
         {
-          return TranslationContentRenderer.Translation(htmlHelper, translationPathExpression);
+            return TranslationContentRenderer.Translation(htmlHelper, translationPathExpression);
         }
 
         public static void RenderTranslation(this HtmlHelper htmlHelper, Expression<Func<Translations, string>> translationPathExpression)
