@@ -1,0 +1,165 @@
+﻿@using EPiServer.Shell.Web.Mvc.Html
+@model Creuna.ResourceEditor.ViewModels.ResourceEditorViewModel
+
+@{
+    ViewBag.Title = "Resource Editor";
+}
+
+<script type="text/javascript" language="javascript">
+    $(function () {
+        var resourceEditorConfig = {};
+
+        resourceEditorConfig.pageSize = @Model.PageSize;
+        resourceEditorConfig.isSimpleMode = '@Model.IsSimpleMode'.toLowerCase() === 'true';
+
+        resourceEditorConfig.defaultOrderBy = '@Model.SortOptions.OrderBy';
+        resourceEditorConfig.defaultOrderByIsAscending = '@Model.SortOptions.Ascending'.toLowerCase() === 'true';
+
+        resourceEditorConfig.autoSaveInterval = @Model.AutoSaveInterval;
+        resourceEditorConfig.allLanguagesKey = '@Model.AllLanguagesKey';
+
+        window.resourceEditorConfig = resourceEditorConfig;
+    });
+
+</script>
+
+<div class="translation-block" data-bind="css: {advanced : isAdvancedMode}">
+    <div class="header">
+        <div class="container">
+            <div class="selection cf">
+                <div class="select-box box">
+                    <label for="fromLangSelect">@Html.Translate("/resourceEditor/searchPanel/from")</label>
+                    <select id="fromLangSelect" data-bind="options: languages,optionsText: 'name', optionsValue: 'key', value: fromLangKey, optionsCaption: '@Html.Translate("/resourceEditor/searchPanel/choose")'"></select>
+                </div>
+                <div class="select-box box">
+                    <label for="toLangselect">@Html.Translate("/resourceEditor/searchPanel/to")</label>
+                    <select id="toLangselect" data-bind="options: languages,optionsText: 'name', optionsValue: 'key', value: toLangKey, optionsCaption: '@Html.Translate("/resourceEditor/searchPanel/choose")'"></select>
+                </div>
+                <div class="box simple-advanced">
+                    <span data-bind="click: changeMode, css: { active: isSimpleMode }">@Html.Translate("/resourceEditor/searchPanel/simple")</span>
+                    <span class="separator" data-bind="css: { active: isAdvancedMode }">|</span>
+                    <span data-bind="click: changeMode, css: { active: isAdvancedMode }">@Html.Translate("/resourceEditor/searchPanel/advanced")</span>
+                </div>
+                <div class="resources-provider" data-bind="css: { advanced: isAdvancedMode }">
+                    <div class="select-box box">
+                        <label for="resurceProviderSelect">@Html.Translate("/resourceEditor/searchPanel/resourceProvider")</label>
+                        <select id="resurceProviderSelect" data-bind="options: resourceProviders,optionsText: 'name', optionsValue: 'key', value: resourceProviderKey">
+                        </select>
+                    </div>
+                    <div class="box todo">
+                        <button class="btn">@Html.Translate("/resourceEditor/advancedMode/import")</button>
+                    </div>
+                    <div class="box">
+                        <button class="btn" data-bind="click: exportAllTranslations">@Html.Translate("/resourceEditor/advancedMode/exportAll")</button>
+                    </div>
+                    <div class="box">
+                        <button class="btn" data-bind="click: exportFilteredTranslations">@Html.Translate("/resourceEditor/advancedMode/exportFiltered")</button>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="cf search-row">
+                <div class="column1">
+                    <div class="box cheker-box">
+                        <input id="checker1" type="checkbox" data-bind="checked: hideTranslated" />
+                        <label for="checker1">@Html.Translate("/resourceEditor/searchPanel/hideTranslated")</label>
+                    </div>
+                    <div class="box search-box">
+                        <input placeholder="@Html.Translate("/resourceEditor/searchPanel/searchPlaceholder")" class="search-field" type="text" data-bind="value: searchTerm" />
+                        <button class="search-field-cleaner" data-bind="click: clearSearchTerm">@Html.Translate("/resourceEditor/searchPanel/clear")</button>
+                    </div>
+                    <div class="box">
+                        <button class="btn search" type="submit" data-bind="click: loadTranslations">@Html.Translate("/resourceEditor/searchPanel/loadTranslations")</button>
+                    </div>
+                    <div class="box" data-bind="click: resetFilters">
+                        <button class="btn">@Html.Translate("/resourceEditor/searchPanel/resetAllFilters")</button>
+                    </div>
+                </div>
+                <div class="column2" data-bind="visible: errorMessageVisible">
+                    <div class="errorMessage" data-bind="text: errorMessage"></div>
+                </div>
+            </div>
+            <div class="cf results" data-bind="visible: loadedTranslationsCount() > 0">
+                <table class="">
+                    <tr>
+                        <th>
+                            <h2 class="title sortable" data-bind="click: sortByKey, css: { asc : orderedByKeyAsc, desc : orderedByKeyDesc }">@Html.Translate("/resourceEditor/translations/columnHeaders/key")</h2>
+                            <div class="box search-box">
+                                <input placeholder="@Html.Translate("/resourceEditor/translations/common/searchPlaceholder")" class="search-field" type="text" data-bind="value: keyFilter, valueUpdate: 'keyup'" />
+                                <button class="search-field-cleaner" data-bind="click: clearFilterByKey">@Html.Translate("/resourceEditor/translations/common/clear")</button>
+                            </div>
+                        </th>
+                        <th>
+                            <h2 class="title sortable" data-bind="click: sortByFrom, css: { asc : orderedByFromAsc, desc : orderedByFromDesc }">@Html.Translate("/resourceEditor/translations/columnHeaders/from")</h2>
+                            <div class="box search-box">
+                                <input placeholder="@Html.Translate("/resourceEditor/translations/common/searchPlaceholder")" class="search-field" type="text" data-bind="value: fromFilter, valueUpdate: 'keyup'" />
+                                <button class="search-field-cleaner" data-bind="click: clearFilterByFrom">@Html.Translate("/resourceEditor/translations/common/clear")</button>
+                            </div>
+                        </th>
+                        <th>
+                            <h2 class="title sortable" data-bind="click: sortByTo, css: { asc : orderedByToAsc, desc : orderedByToDesc }">@Html.Translate("/resourceEditor/translations/columnHeaders/to")</h2>
+                            <div class="box search-box">
+                                <input placeholder="@Html.Translate("/resourceEditor/translations/common/searchPlaceholder")" class="search-field" type="text" data-bind="value: toFilter, valueUpdate: 'keyup'" />
+                                <button class="search-field-cleaner" data-bind="click: clearFilterByTo">@Html.Translate("/resourceEditor/translations/common/clear")</button>
+                            </div>
+                        </th>
+                        <th>
+                            <h2 class="title">@Html.Translate("/resourceEditor/translations/columnHeaders/status")</h2>
+                        </th>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="content container">
+        <div class="cf results">
+            <table>
+                <tbody data-bind="foreach: translationsToShow">
+                    <tr data-bind="css: { zebra: $index() % 2 > 0, 'error-row': errorMessageVisible, 'exportable-row': ($data.canBeExported() && $root.isAdvancedMode()) } ">
+                        <td><div data-bind="text: key"></div></td>
+                        <td><div data-bind="text: from"></div></td>
+                        <td>
+                            <div class="textContent" data-bind="text: to"></div>
+                            <textarea class="editeble" data-bind="value: to" rows="1" cols="10"></textarea>
+                        </td>
+                        <td>
+                            <div class="saved" data-bind="text: statusMessage, visible: statusMessageVisible"></div>
+                            <div class="error" data-bind="visible: errorMessageVisible">
+                                @Html.Translate("/resourceEditor/translations/common/error")
+                                <div class="error-hint" data-bind="text: errorMessage, visible: errorMessageVisible"></div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="cf">
+            <button class="btn center" data-bind="click: loadMoreTranslations, visible: loadMoreButtonVisible">@Html.Translate("/resourceEditor/translations/loadMore")</button>
+        </div>
+    </div>
+    <div class="spacer"></div>
+</div>
+<div class="footer">
+    <div class="footer-gradient"></div>
+    <div class="footer-wrap">
+        <div class="container">
+            <div class="column1">
+                <div class="filter-info cf" data-bind="visible: loadedTranslationsCount() > 0">
+                    <div class="box"><b data-bind="text: loadedTranslationsCount"></b> @Html.Translate("/resourceEditor/translations/itemsLoaded") <b data-bind="text: totalTranslationsCount"></b></div>
+                </div>
+                <div class="filter-info cf">
+                    <div class="box" data-bind="visible: anyFilterApplied">@Html.Translate("/resourceEditor/translations/appliedFilters") (<b data-bind="text: appliedFilterItemsCount"></b> @Html.Translate("/resourceEditor/translations/itemsAreShown")):</div>
+                    <div class="box" data-bind="visible: keyFilterApplied">@Html.Translate("/resourceEditor/translations/clientFiltersApplied/key") - "<b data-bind="text: keyFilter"></b>"</div>
+                    <div class="box" data-bind="visible: fromFilterApplied">@Html.Translate("/resourceEditor/translations/clientFiltersApplied/from") - "<b data-bind="text: fromFilter"></b>"</div>
+                    <div class="box" data-bind="visible: toFilterApplied">@Html.Translate("/resourceEditor/translations/clientFiltersApplied/to") - "<b data-bind="text: toFilter"></b>"</div>
+                </div>
+            </div>
+            <div class="column2">
+                <div class="successfulMessage" data-bind="text: statusMessage, visible: statusMessageVisible"></div>
+            </div>
+        </div>
+    </div>
+</div>
+

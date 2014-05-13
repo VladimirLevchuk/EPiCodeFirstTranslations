@@ -1,0 +1,16 @@
+﻿@using Creuna.ResourceEditor.App_Start
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    @Styles.Render(BundleConfig.EditorStylesBundlePath)
+    @Scripts.Render("~/resource-editor/libs/jquery-1.8.3")
+    @Scripts.Render("~/resource-editor/libs/knockout-3.1.0")
+    <title>@ViewBag.Title</title>
+</head>
+    <body>
+        @RenderBody()
+        
+        @Scripts.Render(BundleConfig.EditorScriptsBundlePath)
+    </body>
+</html>
