@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Creuna.EPiCodeFirstTranslations.Presentation.Models.Pages;
+using Creuna.EPiCodeFirstTranslations.Presentation.Orchestrators;
 using Creuna.EPiCodeFirstTranslations.Presentation.Translation;
 using Creuna.EPiCodeFirstTranslations.Presentation.ViewModels.Pages;
 using EPiServer.ServiceLocation;
@@ -13,16 +14,16 @@ namespace Creuna.EPiCodeFirstTranslations.Presentation.Controllers
 {
     public class FrontController : PageController<FrontPage>
     {
-        protected virtual TranslationService Translations { get; private set; }
+        protected virtual FrontOrchestrator Orchestrator { get; private set; }
 
         public FrontController()
         {
-            Translations = ServiceLocator.Current.GetInstance<TranslationService>();
+            Orchestrator = ServiceLocator.Current.GetInstance<FrontOrchestrator>();
         }
 
         public ActionResult Index(FrontPage currentPage)
         {
-            return View(new FrontPageViewModel() { Header = Translations.Translate(t => t.Texts.Hello) });
+            return View(Orchestrator.GetPageModel());
         }
     }
 }

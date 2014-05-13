@@ -31,7 +31,7 @@ namespace Creuna.EPiCodeFirstTranslations
 
         public IEnumerable<CultureInfo> GetSupportedCultures()
         {
-            return new[] { ServiceLocator.Current.GetInstance<TTranslationContent>().Culture };
+            return new[] { ServiceLocator.Current.GetInstance<TTranslationContent>().ContentCulture };
         }
 
         public virtual ITranslationContent GetTranslations(CultureInfo culture)

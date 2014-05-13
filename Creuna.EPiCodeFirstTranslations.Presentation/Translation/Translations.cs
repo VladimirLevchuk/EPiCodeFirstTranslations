@@ -9,27 +9,14 @@ namespace Creuna.EPiCodeFirstTranslations.Presentation.Translation
     {
         public Translations()
         {
-            Culture = CultureInfo.GetCultureInfo("en");
             Texts = new Texts();
             Labels = new Labels();
         }
 
-        public CultureInfo Culture { get; private set; }
+        public CultureInfo ContentCulture { get { return CultureInfo.GetCultureInfo("en"); } }
 
         public Texts Texts { get; private set; }
 
         public Labels Labels { get; private set; }
-    }
-
-    public class Texts
-    {
-        public string Hello { get { return "Hello everybody!"; } }
-    }
-
-    public class Labels
-    {
-        public string Ok { get { return "Ok!!!"; } }
-
-        public string Cancel { get { return "Cancel!!!"; } }
     }
 }

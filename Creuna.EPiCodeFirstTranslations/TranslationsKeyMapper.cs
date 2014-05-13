@@ -109,12 +109,12 @@ namespace Creuna.EPiCodeFirstTranslations
             var pathAttrs = contentType.GetCustomAttributes(typeof(TranslationPathAttribute), false).Cast<TranslationPathAttribute>();
             foreach (var pathAttr in pathAttrs)
             {
-                paths.Add(pathAttr.Path.ToLower());
+                paths.Add(pathAttr.Path);
             }
 
             if (paths.Count == 0)
             {
-                var defaultPath = contentType.Name.ToLower();
+                var defaultPath = contentType.Name;
                 paths.Add(defaultPath);
             }
 
@@ -175,12 +175,12 @@ namespace Creuna.EPiCodeFirstTranslations
         protected virtual IEnumerable<string> GetTranslationPropertyKeys(PropertyInfo propertyInfo)
         {
             var keys = new HashSet<string>();
-            var defaultKey = propertyInfo.Name.ToLower();
+            var defaultKey = propertyInfo.Name;
             keys.Add(defaultKey);
             var keyAttrs = propertyInfo.GetCustomAttributes(typeof(TranslationKeyAttribute), false).Cast<TranslationKeyAttribute>();
             foreach (var keyAttr in keyAttrs)
             {
-                keys.Add(keyAttr.Key.ToLower());
+                keys.Add(keyAttr.Key);
             }
 
             return keys;

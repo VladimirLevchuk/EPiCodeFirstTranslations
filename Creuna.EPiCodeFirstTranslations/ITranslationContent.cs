@@ -4,6 +4,6 @@ namespace Creuna.EPiCodeFirstTranslations
 {
     public interface ITranslationContent
     {
-        CultureInfo Culture { get; }
+        CultureInfo ContentCulture { get; }
     }
 }

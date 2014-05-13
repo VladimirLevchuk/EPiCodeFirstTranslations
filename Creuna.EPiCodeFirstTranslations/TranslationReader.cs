@@ -22,7 +22,7 @@ namespace Creuna.EPiCodeFirstTranslations
                 throw new ArgumentNullException("culture");
             }
 
-            if (!culture.Equals(translationContent.Culture))
+            if (!culture.Equals(translationContent.ContentCulture))
             {
                 return null;
             }
