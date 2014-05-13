@@ -2,6 +2,7 @@
 using System.Linq.Expressions;
 using System.Web;
 using System.Web.Mvc;
+using Creuna.EPiCodeFirstTranslations;
 using EPiServer.ServiceLocation;
 
 namespace Creuna.EPiCodeFirstTranslations.Presentation.Translation

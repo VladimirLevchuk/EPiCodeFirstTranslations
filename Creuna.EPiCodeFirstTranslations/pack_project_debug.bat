@@ -1,0 +1,1 @@
+nuget pack %1 -Properties Configuration=Debug;VisualStudioVersion=12.0
