@@ -172,18 +172,12 @@
     <Compile Include="TranslationReader.cs" />
     <Compile Include="TranslationServiceBase.cs" />
     <Compile Include="TranslationsKeyMapper.cs" />
-    <Content Include="Creuna.BuildTools\NuGet.exe" />
-    <Content Include="Creuna.BuildTools\Readme.txt" />
     <Content Include="Translation\HtmlHelperExtentions.cs.pp" />
     <Content Include="Translation\Translations.cs.pp" />
     <Content Include="Translation\TranslationService.cs.pp" />
     <Content Include="Views\Web.config.transform" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Creuna.BuildTools\BuildAndPushNewPackage.ps1" />
-    <None Include="Creuna.BuildTools\New-NuGetPackage.ps1" />
-    <None Include="Creuna.BuildTools\SaveMsBuildParams.ps1" />
-    <None Include="Creuna.BuildTools\UpdateAssemblyVersion.ps1" />
     <None Include="Creuna.EPiCodeFirstTranslations.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
