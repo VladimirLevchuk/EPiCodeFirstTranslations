@@ -1,0 +1,11 @@
+﻿@model Creuna.EPiCodeFirstTranslations.Presentation.ViewModels.Pages.FrontPageViewModel
+
+@{
+    ViewBag.Title = "title";
+}
+
+<h2>@Model.Header</h2>
+
+<p>ok label is " @Html.Translation(t => t.Labels.Ok)"</p>
+
+<p>Cancel label is "@{ Html.RenderTranslation(t => t.Labels.Cancel); }"</p>
