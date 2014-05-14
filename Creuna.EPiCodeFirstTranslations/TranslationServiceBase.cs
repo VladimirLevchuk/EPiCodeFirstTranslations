@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq.Expressions;
-using Castle.MicroKernel.Internal;
 using EPiServer.Framework.Localization;
 using EPiServer.ServiceLocation;
 
@@ -12,7 +11,7 @@ namespace Creuna.EPiCodeFirstTranslations
         where TTranslationContent : ITranslationContent
     {
         private readonly Lazy<LocalizationService> _localizationService = new Lazy<LocalizationService>(ServiceLocator.Current.GetInstance<LocalizationService>);
-        private readonly Lazy<TranslationsKeyMapper> _translationKeyMapper = new Lazy<TranslationsKeyMapper>(ServiceLocator.Current.GetInstance<TranslationsKeyMapper>); 
+        private readonly Lazy<TranslationsKeyMapper> _translationKeyMapper = new Lazy<TranslationsKeyMapper>(ServiceLocator.Current.GetInstance<TranslationsKeyMapper>);
 
         protected virtual LocalizationService LocalizationService { get { return _localizationService.Value; } }
 
@@ -51,7 +50,7 @@ namespace Creuna.EPiCodeFirstTranslations
 
         protected virtual string GetTranslationKey(Expression<Func<TTranslationContent, string>> translationPath)
         {
-           return TranslationsKeyMapper.GetTranslationKey(typeof(TTranslationContent), ExpressionUtils.GetPropertyPath(translationPath));
+            return TranslationsKeyMapper.GetTranslationKey(typeof(TTranslationContent), ExpressionUtils.GetPropertyPath(translationPath));
         }
 
         protected virtual string GetTranslation(string translationKey)
