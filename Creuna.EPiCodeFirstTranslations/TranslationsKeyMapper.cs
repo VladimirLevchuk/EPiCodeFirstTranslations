@@ -13,12 +13,13 @@ namespace Creuna.EPiCodeFirstTranslations
         private const string KeyPartsSeparator = "/";
         private const string PropertyPathSeparator = ".";
 
-        private readonly Dictionary<Type, Dictionary<string, string>> _keyMaps = new Dictionary<Type, Dictionary<string, string>>();
+        private readonly Dictionary<Type, Dictionary<string, string>> _propertyPathToTranslationKeyMaps = new Dictionary<Type, Dictionary<string, string>>();
+        private readonly Dictionary<Type, Dictionary<string, string>> _translationKeyToPropertyPathMaps = new Dictionary<Type, Dictionary<string, string>>();
 
         public Dictionary<string, string> GetValueKeysMap(Type translationContentType, string translationKey)
         {
             translationKey = PrepareTranslationKey(translationKey ?? string.Empty);
-            var keysMap = GetTranslationKeysMap(translationContentType);
+            var keysMap = GetTranslationKeyToPropertyPathMap(translationContentType);
 
             if (string.IsNullOrEmpty(translationKey))
             {
@@ -32,10 +33,18 @@ namespace Creuna.EPiCodeFirstTranslations
         public string GetValueKey(Type translationContentType, string translationKey)
         {
             translationKey = PrepareTranslationKey(translationKey);
-            var keysMap = GetTranslationKeysMap(translationContentType);
+            var valueMap = GetTranslationKeyToPropertyPathMap(translationContentType);
             string propertyKey;
-            keysMap.TryGetValue(translationKey, out propertyKey);
+            valueMap.TryGetValue(translationKey, out propertyKey);
             return propertyKey;
+        }
+
+        public string GetTranslationKey(Type translationContentType, string valueKey)
+        {
+            var keyMap = GetPropertyPathToTranslationKeyMap(translationContentType);
+            string key;
+            keyMap.TryGetValue(valueKey, out key);
+            return key;
         }
 
         protected virtual string PrepareTranslationKey(string key)
@@ -58,26 +67,38 @@ namespace Creuna.EPiCodeFirstTranslations
             return key;
         }
 
-        protected virtual Dictionary<string, string> GetTranslationKeysMap(Type translationContentType)
+        protected virtual Dictionary<string, string> GetTranslationKeyToPropertyPathMap(Type translationContentType)
         {
             Dictionary<string, string> map;
-            if (!_keyMaps.TryGetValue(translationContentType, out map))
+            while (!_translationKeyToPropertyPathMaps.TryGetValue(translationContentType, out map))
             {
-                map = BuildTranslationKeysMap(translationContentType);
-                _keyMaps.Add(translationContentType, map);
+                BuildTranslationKeysMaps(translationContentType);
             }
 
             return map;
         }
 
-        protected virtual Dictionary<string, string> BuildTranslationKeysMap(Type contentType)
+        protected virtual Dictionary<string, string> GetPropertyPathToTranslationKeyMap(Type translationContentType)
         {
-            var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            FetchContentTranslationKeys(map, contentType, Enumerable.Empty<string>(), string.Empty);
+            Dictionary<string, string> map;
+            while (!_propertyPathToTranslationKeyMaps.TryGetValue(translationContentType, out map))
+            {
+                BuildTranslationKeysMaps(translationContentType);
+            }
+
             return map;
         }
 
-        protected virtual void FetchContentTranslationKeys(Dictionary<string, string> map, Type contentType, IEnumerable<string> parentTranslationPaths, string contentTypePath)
+        protected virtual void BuildTranslationKeysMaps(Type contentType)
+        {
+            var translationKeyToPropertyPathMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            var propertyPathToTranslationKeyMap = new Dictionary<string, string>();
+            FetchContentTranslationKeys(translationKeyToPropertyPathMap, propertyPathToTranslationKeyMap, contentType, Enumerable.Empty<string>(), string.Empty);
+            _translationKeyToPropertyPathMaps.Add(contentType, translationKeyToPropertyPathMap);
+            _propertyPathToTranslationKeyMaps.Add(contentType, propertyPathToTranslationKeyMap);
+        }
+
+        protected virtual void FetchContentTranslationKeys(Dictionary<string, string> translationKeyToPropertyPathMap, Dictionary<string, string> propertyPathToTranslationKeyMap, Type contentType, IEnumerable<string> parentTranslationPaths, string contentTypePath)
         {
             var localContentTranslationPaths = GetTranslationPaths(contentType);
             var currentContentTranslationPaths = BuildKeyPaths(parentTranslationPaths, localContentTranslationPaths).ToList();
@@ -87,18 +108,23 @@ namespace Creuna.EPiCodeFirstTranslations
             {
                 var propertyTranslationKeys = GetTranslationPropertyKeys(translationProp);
                 propertyTranslationKeys = BuildKeyPaths(currentContentTranslationPaths, propertyTranslationKeys);
+                var propertyPath = CombineTypePropertyPath(contentTypePath, translationProp.Name);
+
+                // ReSharper disable PossibleMultipleEnumeration
                 foreach (var propertyKey in propertyTranslationKeys)
                 {
                     var translationKey = PrepareTranslationKey(propertyKey);
-                    var propertyPath = CombineTypePropertyPath(contentTypePath, translationProp.Name);
-                    map.Add(translationKey, propertyPath);
+                    translationKeyToPropertyPathMap.Add(translationKey, propertyPath);
                 }
+
+                propertyPathToTranslationKeyMap.Add(propertyPath, PrepareTranslationKey(propertyTranslationKeys.First()));
+                // ReSharper restore PossibleMultipleEnumeration
             }
 
             var childContentTypeProps = GetChildTranslationContentTypeProperties(contentType);
             foreach (var childContentTypeProp in childContentTypeProps)
             {
-                FetchContentTranslationKeys(map, childContentTypeProp.PropertyType, currentContentTranslationPaths, CombineTypePropertyPath(contentTypePath, childContentTypeProp.Name));
+                FetchContentTranslationKeys(translationKeyToPropertyPathMap, propertyPathToTranslationKeyMap, childContentTypeProp.PropertyType, currentContentTranslationPaths, CombineTypePropertyPath(contentTypePath, childContentTypeProp.Name));
             }
         }
 

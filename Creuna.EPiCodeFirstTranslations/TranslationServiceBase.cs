@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq.Expressions;
+using Castle.MicroKernel.Internal;
 using EPiServer.Framework.Localization;
 using EPiServer.ServiceLocation;
 
@@ -11,8 +12,11 @@ namespace Creuna.EPiCodeFirstTranslations
         where TTranslationContent : ITranslationContent
     {
         private readonly Lazy<LocalizationService> _localizationService = new Lazy<LocalizationService>(ServiceLocator.Current.GetInstance<LocalizationService>);
+        private readonly Lazy<TranslationsKeyMapper> _translationKeyMapper = new Lazy<TranslationsKeyMapper>(ServiceLocator.Current.GetInstance<TranslationsKeyMapper>); 
 
         protected virtual LocalizationService LocalizationService { get { return _localizationService.Value; } }
+
+        protected virtual TranslationsKeyMapper TranslationsKeyMapper { get { return _translationKeyMapper.Value; } }
 
         public string Translate(Expression<Func<TTranslationContent, string>> translationPath)
         {
@@ -21,7 +25,13 @@ namespace Creuna.EPiCodeFirstTranslations
                 throw new ArgumentNullException("translationPath");
             }
 
-            return GetTranslation(GetTranslationKey(translationPath));
+            var translationKey = GetTranslationKey(translationPath);
+            if (translationKey == null)
+            {
+                throw new ArgumentException(string.Format("Unable to resolve translation by {0} expression.", translationPath), "translationPath");
+            }
+
+            return GetTranslation(translationKey);
         }
 
         public Type GetTranslationContentType()
@@ -41,7 +51,7 @@ namespace Creuna.EPiCodeFirstTranslations
 
         protected virtual string GetTranslationKey(Expression<Func<TTranslationContent, string>> translationPath)
         {
-            return "/" + ExpressionUtils.GetPropertyPath(translationPath).Replace(".", "/");
+           return TranslationsKeyMapper.GetTranslationKey(typeof(TTranslationContent), ExpressionUtils.GetPropertyPath(translationPath));
         }
 
         protected virtual string GetTranslation(string translationKey)
