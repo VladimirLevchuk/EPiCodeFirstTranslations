@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+  <episerver.framework>
+    <localization>
+      <providers>
+        <add name="CodeFirstLocalizationProvider" type="Creuna.EPiCodeFirstTranslations.CodeFirstLocalizationProvider" />
+      </providers>
+    </localization>
+  </episerver.framework>
+</configuration>
