@@ -20,25 +20,45 @@ namespace Creuna.EPiCodeFirstTranslations
 
         public IHtmlString Translation(HtmlHelper htmlHelper, Expression<Func<TTranslationContent, string>> translationPathExpression)
         {
-            if (htmlHelper == null)
-            {
-                throw new ArgumentNullException("htmlHelper");
-            }
-
-            if (translationPathExpression == null)
-            {
-                throw new ArgumentNullException("translationPathExpression");
-            }
-
-            using (var writer = new StringWriter(CultureInfo.CurrentCulture))
-            {
-                RenderTranslation(htmlHelper, translationPathExpression, writer);
-                return MvcHtmlString.Create(writer.ToString());
-            }
+            return WriteToHtmlString(w => RenderTranslation(htmlHelper, w, translationPathExpression));
         }
 
         public void RenderTranslation(HtmlHelper htmlHelper, Expression<Func<TTranslationContent, string>> translationPathExpression)
         {
+            RenderTranslation(htmlHelper, htmlHelper.ViewContext.Writer, translationPathExpression);
+        }
+
+        public IHtmlString TranslationFormat(HtmlHelper htmlHelper, Expression<Func<TTranslationContent, string>> translationPathExpression, params object[] args)
+        {
+            return WriteToHtmlString(w => RenderTranslation(htmlHelper, w, translationPathExpression, t => FormatTranslation(t, args)));
+        }
+
+        public void RenderTranslationFormat(HtmlHelper htmlHelper, Expression<Func<TTranslationContent, string>> translationPathExpression, params object[] args)
+        {
+            RenderTranslation(htmlHelper, htmlHelper.ViewContext.Writer, translationPathExpression, t => FormatTranslation(t, args));
+        }
+
+        protected virtual string FormatTranslation(string translation, object[] args)
+        {
+            return string.Format(translation, args);
+        }
+
+        protected virtual void RenderTranslation(HtmlHelper htmlHelper, TextWriter writer, string translation)
+        {
+            writer.Write(translation);
+        }
+
+        protected IHtmlString WriteToHtmlString(Action<TextWriter> writeAction)
+        {
+            using (var writer = new StringWriter(CultureInfo.CurrentCulture))
+            {
+                writeAction(writer);
+                return MvcHtmlString.Create(writer.ToString());
+            }
+        }
+
+        private void RenderTranslation(HtmlHelper htmlHelper, TextWriter writer, Expression<Func<TTranslationContent, string>> translationPathExpression, Func<string, string> prepareToRenderFunction = null)
+        {
             if (htmlHelper == null)
             {
                 throw new ArgumentNullException("htmlHelper");
@@ -49,12 +69,13 @@ namespace Creuna.EPiCodeFirstTranslations
                 throw new ArgumentNullException("translationPathExpression");
             }
 
-            RenderTranslation(htmlHelper, translationPathExpression, htmlHelper.ViewContext.Writer);
-        }
+            string translation = TranslationService.Translate(translationPathExpression);
+            if (prepareToRenderFunction != null)
+            {
+                translation = prepareToRenderFunction(translation);
+            }
 
-        protected virtual void RenderTranslation(HtmlHelper htmlHelper, Expression<Func<TTranslationContent, string>> translationPathExpression, TextWriter writer)
-        {
-            writer.Write(TranslationService.Translate(translationPathExpression));
+            RenderTranslation(htmlHelper, writer, translation);
         }
     }
 }

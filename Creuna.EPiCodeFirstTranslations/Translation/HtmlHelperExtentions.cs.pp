@@ -23,5 +23,15 @@ namespace $rootnamespace$.Translation
         {
             TranslationContentRenderer.RenderTranslation(htmlHelper, translationPathExpression);
         }
+
+        public static IHtmlString TranslationFormat(this HtmlHelper htmlHelper, Expression<Func<Translations, string>> translationPathExpression, params object[] args)
+        {
+            return TranslationContentRenderer.TranslationFormat(htmlHelper, translationPathExpression, args);
+        }
+
+        public static void RenderTranslationFormat(this HtmlHelper htmlHelper, Expression<Func<Translations, string>> translationPathExpression, params object[] args)
+        {
+            TranslationContentRenderer.RenderTranslationFormat(htmlHelper, translationPathExpression, args);
+        }
     }
 }

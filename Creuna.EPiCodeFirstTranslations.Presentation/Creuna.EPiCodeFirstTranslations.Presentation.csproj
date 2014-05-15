@@ -273,6 +273,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Orchestrators\FrontOrchestrator.cs" />
+    <Compile Include="Translation\Formats.cs" />
     <Compile Include="Translation\HtmlHelperExtentions.cs" />
     <Compile Include="Models\Pages\FrontPage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
