@@ -4,9 +4,11 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using Creuna.EPiCodeFirstTranslations.Attributes;
+using EPiServer.ServiceLocation;
 
 namespace Creuna.EPiCodeFirstTranslations
 {
+    [ServiceConfiguration(typeof(TranslationsKeyMapper), Lifecycle = ServiceInstanceScope.Singleton)]
     public class TranslationsKeyMapper
     {
         private const string RootedKeyStart = "~/";

@@ -8,7 +8,7 @@
     </ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{E9D23BE4-3F1A-49EB-AE90-421CCB87C9D8}</ProjectGuid>
-    <ProjectTypeGuids>{E3E379DF-F4C6-4180-9B81-6769533ABE47};{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Creuna.EPiCodeFirstTranslations.Presentation</RootNamespace>
@@ -318,7 +318,9 @@
     <Content Include="configs\connectionStrings.config" />
     <Content Include="configs\smtp.config" />
     <Content Include="configs\epi\EPiServer.config" />
-    <Content Include="configs\epi\EPiServerFramework.config" />
+    <Content Include="configs\epi\EPiServerFramework.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="configs\epi\EPiServerSearch.config" />
     <None Include="EPiServerLog.config" />
     <Content Include="packages.config" />
