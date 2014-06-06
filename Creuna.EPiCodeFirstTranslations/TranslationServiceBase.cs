@@ -12,6 +12,7 @@ namespace Creuna.EPiCodeFirstTranslations
     {
         private readonly Lazy<LocalizationService> _localizationService = new Lazy<LocalizationService>(ServiceLocator.Current.GetInstance<LocalizationService>);
         private readonly Lazy<TranslationsKeyMapper> _translationKeyMapper = new Lazy<TranslationsKeyMapper>(ServiceLocator.Current.GetInstance<TranslationsKeyMapper>);
+        private readonly Lazy<TTranslationContent> _translations = new Lazy<TTranslationContent>(ServiceLocator.Current.GetInstance<TTranslationContent>); 
 
         protected virtual LocalizationService LocalizationService { get { return _localizationService.Value; } }
 
@@ -35,17 +36,17 @@ namespace Creuna.EPiCodeFirstTranslations
 
         public Type GetTranslationContentType()
         {
-            return ServiceLocator.Current.GetInstance<TTranslationContent>().GetType();
+            return _translations.Value.GetType();
         }
 
         public IEnumerable<CultureInfo> GetSupportedCultures()
         {
-            return new[] { ServiceLocator.Current.GetInstance<TTranslationContent>().ContentCulture };
+            return new[] { _translations.Value.ContentCulture };
         }
 
         public virtual ITranslationContent GetTranslations(CultureInfo culture)
         {
-            return ServiceLocator.Current.GetInstance<TTranslationContent>();
+            return _translations.Value;
         }
 
         protected virtual string GetTranslationKey(Expression<Func<TTranslationContent, string>> translationPath)

@@ -1,17 +1,21 @@
 ﻿using System;
 using System.Globalization;
+using System.Runtime.Caching;
+using Creuna.EPiCodeFirstTranslations.Utils;
 
 namespace Creuna.EPiCodeFirstTranslations
 {
     public class TranslationReader
     {
-        public string GetTranslation(ITranslationContent translationContent, string translationValueKey, CultureInfo culture)
+        private readonly SimpleMemoryCache _cache = new SimpleMemoryCache(typeof(TranslationReader).FullName);
+
+        public virtual string GetTranslation(ITranslationContent translationContent, string translationValueKey, CultureInfo culture)
         {
             if (translationContent == null)
             {
                 throw new ArgumentNullException("translationContent");
             }
-            
+
             if (string.IsNullOrEmpty(translationValueKey))
             {
                 throw new ArgumentNullException("translationValueKey");
@@ -27,18 +31,15 @@ namespace Creuna.EPiCodeFirstTranslations
                 return null;
             }
 
-            object propertyValue = GetPropertyValue(translationContent, translationValueKey);
-            if (propertyValue != null)
-            {
-                return propertyValue.ToString();
-            }
+            string cacheKey = string.Format("contentHachCode:{0} key:{1}", translationContent.GetHashCode(), translationValueKey);
+            var translation = _cache.GetOrLoad(cacheKey, () => ReadTranslation(translationContent, translationValueKey));
 
-            return null;
+            return translation;
         }
 
-        protected virtual object GetPropertyValue(object instance, string propertyPath)
+        protected virtual string ReadTranslation(object instance, string translationKey)
         {
-            string[] propertyNames = propertyPath.Split('.');
+            string[] propertyNames = translationKey.Split('.');
 
             foreach (var propertyName in propertyNames)
             {
@@ -51,7 +52,7 @@ namespace Creuna.EPiCodeFirstTranslations
                 instance = property.GetValue(instance, null);
             }
 
-            return instance;
+            return instance != null ? instance.ToString() : string.Empty;
         }
     }
 }
