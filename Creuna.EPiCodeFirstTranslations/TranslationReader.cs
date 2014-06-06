@@ -7,6 +7,8 @@ namespace Creuna.EPiCodeFirstTranslations
 {
     public class TranslationReader
     {
+        private const string NullValue = "<NULL_CACHE_VALUE>";
+
         private readonly SimpleMemoryCache _cache = new SimpleMemoryCache(typeof(TranslationReader).FullName);
 
         public virtual string GetTranslation(ITranslationContent translationContent, string translationValueKey, CultureInfo culture)
@@ -32,9 +34,9 @@ namespace Creuna.EPiCodeFirstTranslations
             }
 
             string cacheKey = string.Format("contentHachCode:{0} key:{1}", translationContent.GetHashCode(), translationValueKey);
-            var translation = _cache.GetOrLoad(cacheKey, () => ReadTranslation(translationContent, translationValueKey));
+            var translation = _cache.GetOrLoad(cacheKey, () => ReadTranslation(translationContent, translationValueKey) ?? NullValue);
 
-            return translation;
+            return translation == NullValue ? null: translation;
         }
 
         protected virtual string ReadTranslation(object instance, string translationKey)
@@ -52,7 +54,7 @@ namespace Creuna.EPiCodeFirstTranslations
                 instance = property.GetValue(instance, null);
             }
 
-            return instance != null ? instance.ToString() : string.Empty;
+            return (string)instance;
         }
     }
 }
