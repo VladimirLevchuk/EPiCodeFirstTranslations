@@ -95,9 +95,30 @@ namespace Creuna.EPiCodeFirstTranslations
         {
             var translationKeyToPropertyPathMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             var propertyPathToTranslationKeyMap = new Dictionary<string, string>();
-            FetchContentTranslationKeys(translationKeyToPropertyPathMap, propertyPathToTranslationKeyMap, contentType, Enumerable.Empty<string>(), string.Empty);
+
+            if (contentType.IsEnum)
+            {
+                FetchEnumTranslationKeys(translationKeyToPropertyPathMap, propertyPathToTranslationKeyMap, contentType);
+            }
+            else
+            {
+                FetchContentTranslationKeys(translationKeyToPropertyPathMap, propertyPathToTranslationKeyMap, contentType, Enumerable.Empty<string>(), string.Empty);
+            }
+
             _translationKeyToPropertyPathMaps.Add(contentType, translationKeyToPropertyPathMap);
             _propertyPathToTranslationKeyMaps.Add(contentType, propertyPathToTranslationKeyMap);
+        }
+
+        protected virtual void FetchEnumTranslationKeys(Dictionary<string, string> translationKeyToPropertyPathMap, Dictionary<string, string> propertyPathToTranslationKeyMap, Type enumType)
+        {
+            var enumValues = Enum.GetValues(enumType);
+            foreach (var enumValue in enumValues)
+            {
+                string propertyPath = enumValue.ToString();
+                string translationKey = string.Format("/Enums/{0}/{1}/", enumType.Name, propertyPath);
+                translationKeyToPropertyPathMap.Add(translationKey, propertyPath);
+                propertyPathToTranslationKeyMap.Add(propertyPath, translationKey);
+            }
         }
 
         protected virtual void FetchContentTranslationKeys(Dictionary<string, string> translationKeyToPropertyPathMap, Dictionary<string, string> propertyPathToTranslationKeyMap, Type contentType, IEnumerable<string> parentTranslationPaths, string contentTypePath)

@@ -6,11 +6,12 @@
     @Styles.Render(BundleConfig.EditorStylesBundlePath)
     @Scripts.Render("~/resource-editor/libs/jquery-1.8.3")
     @Scripts.Render("~/resource-editor/libs/knockout-3.1.0")
+    @Scripts.Render("~/resource-editor/libs/jquery.iframe-transport")
+    @Scripts.Render("~/resource-editor/libs/FileSaver")
     <title>@ViewBag.Title</title>
 </head>
-    <body>
-        @RenderBody()
-        
-        @Scripts.Render(BundleConfig.EditorScriptsBundlePath)
-    </body>
+<body>
+    @RenderBody()
+    @RenderSection("scripts", false)
+</body>
 </html>

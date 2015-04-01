@@ -11,12 +11,19 @@ namespace Creuna.EPiCodeFirstTranslations
 
         IEnumerable<CultureInfo> GetSupportedCultures();
 
-        ITranslationContent GetTranslations(CultureInfo culture);
+        CultureInfo GetBasicCulture();
+
+        object GetTranslations(CultureInfo culture);
+
+        IEnumerable<Type> GetTranslatableEnumTypes();
     }
 
     public interface ITranslationService<TTranslationContent> : ITranslationService
-        where TTranslationContent : ITranslationContent
     {
         string Translate(Expression<Func<TTranslationContent, string>> translationPathExpression);
+
+        string Translate(Expression<Func<TTranslationContent, string>> translationPathExpression, string fallback);
+
+        string TranslateEnumValue(Enum value);
     }
 }

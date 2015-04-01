@@ -63,8 +63,8 @@
       <HintPath>..\packages\EPiServer.CMS.UI.Core.7.7.0\lib\net40\CMS.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Creuna.ResourceEditor, Version=1.0.4145.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Creuna.ResourceEditor.1.0.4145-alpha\lib\net45\Creuna.ResourceEditor.dll</HintPath>
+    <Reference Include="Creuna.ResourceEditor, Version=1.0.6979.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Creuna.ResourceEditor.1.0.6979\lib\net45\Creuna.ResourceEditor.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -224,6 +224,7 @@
     <Reference Include="System.Web.Mvc, Version=5.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.AspNet.Mvc.5.1.2\lib\net45\System.Web.Mvc.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System.Web.Optimization">
       <HintPath>..\packages\Microsoft.AspNet.Web.Optimization.1.0.0\lib\net40\System.Web.Optimization.dll</HintPath>
@@ -269,6 +270,7 @@
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
   <ItemGroup>
     <Compile Include="Controllers\FrontController.cs" />
+    <Compile Include="Enums\Gender.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -294,21 +296,31 @@
     <Content Include="lang\ResourceEditor.xml" />
     <Content Include="modulesbin\Creuna.ResourceEditor.dll" />
     <Content Include="modules\Creuna.ResourceEditor\bin\Creuna.ResourceEditor.dll" />
+    <Content Include="modules\Creuna.ResourceEditor\ClientResources\Images\ajaxProgress-salt.gif" />
     <Content Include="modules\Creuna.ResourceEditor\ClientResources\Images\arrowDown.png" />
     <Content Include="modules\Creuna.ResourceEditor\ClientResources\Images\arrowUp.png" />
     <Content Include="modules\Creuna.ResourceEditor\ClientResources\Images\clearButtonIcon.png" />
+    <Content Include="modules\Creuna.ResourceEditor\ClientResources\Images\drop-stuff-medium.png" />
     <Content Include="modules\Creuna.ResourceEditor\ClientResources\Images\error.png" />
+    <Content Include="modules\Creuna.ResourceEditor\ClientResources\Images\globalnavigation_bottom.png" />
     <Content Include="modules\Creuna.ResourceEditor\ClientResources\Images\hardcoded.png" />
     <Content Include="modules\Creuna.ResourceEditor\ClientResources\Images\info.png" />
+    <Content Include="modules\Creuna.ResourceEditor\ClientResources\Images\invert.png" />
     <Content Include="modules\Creuna.ResourceEditor\ClientResources\Images\multiline.png" />
     <Content Include="modules\Creuna.ResourceEditor\ClientResources\Images\saved.png" />
     <Content Include="modules\Creuna.ResourceEditor\ClientResources\Images\search.png" />
     <Content Include="modules\Creuna.ResourceEditor\ClientResources\Images\sortable.png" />
+    <Content Include="modules\Creuna.ResourceEditor\ClientResources\Images\SpriteTools.png" />
+    <Content Include="modules\Creuna.ResourceEditor\ClientResources\Images\ToolButtonBg.gif" />
+    <Content Include="modules\Creuna.ResourceEditor\ClientResources\Images\ui-icons_222222_256x240.png" />
     <Content Include="modules\Creuna.ResourceEditor\ClientResources\Scripts\common.js" />
     <Content Include="modules\Creuna.ResourceEditor\ClientResources\Scripts\editor.js" />
+    <Content Include="modules\Creuna.ResourceEditor\ClientResources\Scripts\Libs\FileSaver.js" />
     <Content Include="modules\Creuna.ResourceEditor\ClientResources\Scripts\Libs\jquery-1.8.3.js" />
+    <Content Include="modules\Creuna.ResourceEditor\ClientResources\Scripts\Libs\jquery.iframe-transport.js" />
     <Content Include="modules\Creuna.ResourceEditor\ClientResources\Scripts\Libs\knockout-3.1.0.js" />
     <Content Include="modules\Creuna.ResourceEditor\ClientResources\Styles\translation.css" />
+    <Content Include="modules\Creuna.ResourceEditor\ClientResources\Styles\_jquery-ui-1.10.4.custom.css" />
     <Content Include="Views\Web.config" />
     <Content Include="Global.asax" />
     <Content Include="Web.config" />
@@ -338,7 +350,7 @@
     <Content Include="modules\Creuna.ResourceEditor\Views\Editor\Index.cshtml" />
     <Content Include="modules\Creuna.ResourceEditor\Views\_ViewStart.cshtml" />
     <Content Include="modules\Creuna.ResourceEditor\Views\_layout.cshtml" />
-    <Content Include="modules\Creuna.ResourceEditor\modue.config" />
+    <Content Include="modules\Creuna.ResourceEditor\module.config" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -1,11 +1,9 @@
-﻿using System.Globalization;
-using Creuna.EPiCodeFirstTranslations.Attributes;
-using EPiServer.Framework.Blobs;
+﻿using Creuna.EPiCodeFirstTranslations.Attributes;
 
 namespace Creuna.EPiCodeFirstTranslations.Presentation.Translation
 {
     [TranslationPath("")]
-    public class Translations : ITranslationContent
+    public class Translations
     {
         public Translations()
         {
@@ -13,8 +11,6 @@ namespace Creuna.EPiCodeFirstTranslations.Presentation.Translation
             Labels = new Labels();
             Formats = new Formats();
         }
-
-        public CultureInfo ContentCulture { get { return CultureInfo.GetCultureInfo("en"); } }
 
         public Texts Texts { get; private set; }
 

@@ -33,5 +33,15 @@ namespace $rootnamespace$.Translation
         {
             TranslationContentRenderer.RenderTranslationFormat(htmlHelper, translationPathExpression, args);
         }
+
+        public static IHtmlString TranslationForEnumValue(this HtmlHelper htmlHelper, Enum value)
+        {
+            return TranslationContentRenderer.TranslationForEnumValue(htmlHelper, value);
+        }
+
+        public static void RenderTranslationForEnumValue(this HtmlHelper htmlHelper, Enum value)
+        {
+            TranslationContentRenderer.RenderTranslationForEnumValue(htmlHelper, value);
+        }
     }
 }

@@ -10,15 +10,13 @@ namespace $rootnamespace$.Translation
      */
 
     [TranslationPath("")]
-    public class Translations : ITranslationContent
+    public class Translations
     {
         public Translations()
         {
             //Texts = new Texts();
             //Labels = new Labels();
         }
-
-        public CultureInfo ContentCulture { get { return CultureInfo.GetCultureInfo("en"); } }
 
         //public Texts Texts { get; private set; }
 

@@ -1,9 +1,11 @@
 ﻿/// <reference path="Libs/jquery.js"/>
 /// <reference path="Libs/knockout.js"/>
+/// <reference path="Libs/jquery.iframe-transport.js"/>
+/// <reference path="Libs/FileSaver.js"/>
 
 (function($) {
 
-    var ApiUrlBase = "/modules/Creuna.ResourceEditor/api";
+    var ApiUrlBase = "/modules/Creuna.ResourceEditor/api/";
 
     function stringIsEmpty(value) {
         if (value) {
@@ -16,35 +18,28 @@
     function guid() {
         function s4() {
             return Math.floor((1 + Math.random()) * 0x10000)
-                       .toString(16)
-                       .substring(1);
+                .toString(16)
+                .substring(1);
         }
+
         return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
-               s4() + '-' + s4() + s4() + s4();
-    }
-
-    function findTranslation(allTranslations, translationModel) {
-        var result;
-
-        $(allTranslations).each(function(idx, tempItem) {
-            if (tempItem.key() == translationModel.Key) {
-                result = tempItem;
-                return;
-            }
-        });
-
-        return result;
+            s4() + '-' + s4() + s4() + s4();
     }
 
     function DataController() {
         var self = this;
 
-        var loadData = (function(url, callback) {
-            $.getJSON(ApiUrlBase + url, callback);
+        var loadData = (function(url, onDone, onFail) {
+            $.ajax({
+                url: ApiUrlBase + url,
+                dataType: 'json',
+                contentType: "application/json; charset=utf-8",
+                success: onDone,
+                error: onFail
+            });
         });
 
         var saveData = (function(url, data, onDone, onFail) {
-
             var request = $.ajax({
                 url: ApiUrlBase + url,
                 data: JSON.stringify(data),
@@ -60,150 +55,95 @@
             });
         });
 
-        var loadItems = (function(loadItemsUrl, targetArray, dataToItemMappingFunc, loadFinishedCallback) {
+        var loadItems = (function(loadItemsUrl, targetArray, dataToItemMappingFunc, loadFinishedCallback, onFail) {
             loadData(loadItemsUrl, function(data) {
-                var items = $.map(data, dataToItemMappingFunc);
-                targetArray.removeAll();
-                $(items).each(function(index, item) {
-                    targetArray.push(item);
-                });
+                    if (targetArray != null) {
+                        var items = $.map(data, dataToItemMappingFunc);
 
-                if (loadFinishedCallback != null) {
-                    loadFinishedCallback();
-                }
-            });
+                        targetArray.removeAll();
+                        $(items).each(function(index, item) {
+                            targetArray.push(item);
+                        });
+                    }
+
+                    if (loadFinishedCallback != null) {
+                        loadFinishedCallback(data);
+                    }
+                },
+                onFail);
         });
 
-        var loadTranslationsModel = (function(loadItemsUrl, editorModel, dataToItemMappingFunc) {
-            loadData(loadItemsUrl, function(data) {
-                var items = $.map(data.Items, dataToItemMappingFunc);
-
-                editorModel.statusMessage(data.StatusMessage);
-                editorModel.errorMessage(data.ErrorMessage);
-
-                var numberOfItemsToBeShown = data.Items.length + editorModel.numberOfTranslationsToBeShown();
-                editorModel.numberOfTranslationsToBeShown(numberOfItemsToBeShown);
-
-                $(items).each(function(index, item) {
-                    editorModel.translations.push(item);
-                });
-
-                editorModel.totalTranslationsCount(data.Paging.TotalItemsCount);
-
-                /*editorModel.exportFilteredTranslationsIsVisible(editorModel.isExportFilteredVisible());*/
-
-                editorModel.pageNumber(data.Paging.PageIndex);
-            });
-        });
-
-        var saveItems = (function(saveItemsUrl, targetArray, itemToDataMapingFunc, saveFailedFunc) {
-            $(targetArray).each(function(index, item) {
-                item.updateStatusMessage('Saving');
-            });
+        var saveItems = (function(saveItemsUrl, targetArray, itemToDataMapingFunc, saveSucceededFunc, saveFailedFunc) {
 
             var dataToSave = $.map(targetArray, itemToDataMapingFunc);
 
-            saveData(saveItemsUrl, dataToSave, function(x) {
-
-                $(x).each(function(index, item) {
-
-                    var targetItem = findTranslation(targetArray, item);
-
-                    if (targetItem != null) {
-                        targetItem.updateStatusMessage(item.StatusMessage);
-                        targetItem.updateErrorMessage(item.ErrorMessage);
-                        targetItem.state(item.State);
-                        targetItem.canBeExported(item.CanBeExported);
-                    }
-                });
-            }, saveFailedFunc);
+            saveData(saveItemsUrl, dataToSave, saveSucceededFunc, saveFailedFunc);
         });
 
-        var saveItem = function(saveItemsUrl, item, dataToItemMappingFunc, saveFailedFunc) {
+        var saveItem = function(saveItemsUrl, item, dataToItemMappingFunc, saveSucceededFunc, saveFailedFunc) {
             var items = [item];
-            saveItems(saveItemsUrl, items, dataToItemMappingFunc, saveFailedFunc);
+            saveItems(saveItemsUrl, items, dataToItemMappingFunc, saveSucceededFunc, saveFailedFunc);
         };
 
-        self.loadLanguages = function(targetArray) {
-            loadItems("/languages", targetArray, function(dataItem) { return new Language(dataItem); });
+        self.loadLanguages = function(targetArray, onFail) {
+            loadItems("languages", targetArray, function(dataItem) { return new Language(dataItem); }, onFail);
         };
 
-        self.loadResourceProviders = (function(targetArray) {
-            loadItems("/resourceProviders", targetArray, function(dataItem) { return new ResourceProvider(dataItem); });
+        self.loadResourceProviders = (function(targetArray, onFail) {
+            loadItems("resourceProviders", targetArray, function(dataItem) { return new ResourceProvider(dataItem); }, onFail);
         });
 
-        self.getDownloadLinks = (function (url, requestData, targetArray, mappingFunc, callbackFunc) {
+        self.loadSettings = function(callbackFunction, onFail) {
+            loadItems("settings", null, null, callbackFunction, onFail);
+        }
+
+        self.saveSettings = function(settings, onDone, onFail) {
+            saveData("saveSettings", settings, onDone, onFail);
+        }
+
+        self.loadResourceMessages = function(callbackFunction, onFail) {
+            loadItems("resourceMessages", null, null, callbackFunction, onFail);
+        }
+
+        self.getDownloadLinks = (function(url, toLangKey, filteredKeys, targetArray, mappingFunc, callbackFunc, onFail) {
 
             var options =
             {
-                dataType: "json",
                 url: ApiUrlBase + url,
-                traditional: true,
-                success: function(data) {
-                    var items = $.map(data, mappingFunc);
-                    targetArray.removeAll();
-                    $(items).each(function(index, item) {
-                        targetArray.push(item);
-                    });
-
-                    if (callbackFunc != null) {
-                        callbackFunc();
-                    }
-                }
+                type: "POST",
+                success: callbackFunc,
+                error: onFail
             };
 
-            if (requestData != null) {
-                options.data = { filteredKeys: requestData };
+            options.data = {};
+
+            if (filteredKeys != null) {
+                options.data.FilteredKeys = JSON.stringify(filteredKeys);
+            }
+
+            if (!(stringIsEmpty(toLangKey))) {
+                options.data.ToLangKey = toLangKey;
             }
 
             $.ajax(options);
         });
 
-        self.LoadTranslations = (function (editorModel) {
-            editorModel.statusMessage('Loading translations - please wait...');
-            var requestUrl = "/translations?providerKey=" + editorModel.resourceProviderKey() + "&fromLangKey=" + editorModel.fromLangKey() + "&toLangKey=" + editorModel.toLangKey() + "&page=" + editorModel.pageNumber() + "&pageSize=" + editorModel.pageSize() + "&searchTerm=" + editorModel.searchTerm() + "&hideTranslated=" + editorModel.hideTranslated() + "&orderBy=" + editorModel.orderBy() + "&orderByIsAscending=" + editorModel.orderByIsAscending();
-
-            loadTranslationsModel(requestUrl, editorModel, function (dataItem) {
-                
-                var translation = new Translation(dataItem);
-
-                translation.editor = editorModel;
-
-                translation.save = function () { self.saveTranslation(translation); };
-
-                translation.handleSaveError = editorModel.handleSaveError;
-                
-                translation.currentStatusMessage = function (message) { editorModel.statusMessage(message); }
-                translation.currentErrorMessage = function (message) { editorModel.errorMessage(message); }
-
-                return translation;
-            });
+        self.loadTranslations = (function(url, callbackFunction, onFail) {
+            loadData(url, callbackFunction, onFail);
         });
 
-        self.saveTranslation = (function (translation) {
-            saveItem("/SaveTranslations", translation, function (translationItem) {
-                var translationData = {};
-                translationItem.updateData(translationData);
-                return translationData;
-            }, translation.handleSaveError);
+        self.saveTranslation = (function(translation, mappingFunc, saveSucceededFunc, saveFaledFunc) {
+            saveItem("SaveTranslations", translation, mappingFunc, saveSucceededFunc, saveFaledFunc);
+        });
+
+        self.getImportTranslationsUploadUrl = (function() {
+            return ApiUrlBase + "ImportTranslations";
         });
     }
-
-    $(function () {
-        ko.applyBindings(new EditorViewModel());
-    });
-
 
     function Language(data) {
         this.key = ko.observable(data.Key);
         this.name = ko.observable(data.Name);
-    }
-
-    function DownloadMessage(data) {
-        this.statusMessage = ko.observable(data.StatusMessage);
-        this.errorMessage = ko.observable(data.ErrorMessage);
-        this.downloadUrl = ko.observable(data.DownloadUrl);
-        this.downloaded = false;
     }
 
     function ResourceProvider(data) {
@@ -220,90 +160,75 @@
         self.fromLangKey = ko.observable(data.FromLangKey);
         self.toLangKey = ko.observable(data.ToLangKey);
         self.from = ko.observable(data.From);
-        self.state = ko.observable(data.State);
-        self.canBeExported = ko.observable(data.CanBeExported);
+        self.isOverridden = ko.observable(data.IsOverridden);
+        self.disableSave = ko.observable(false);
 
         if (data.To == null || data.To == undefined) {
             data.To = '';
         }
 
         self.to = ko.observable(data.To);
+        self.message = ko.observable('');
+        self.isError = ko.observable(false);
 
-        self.statusMessage = ko.observable('');
-        self.errorMessage = ko.observable('');
+        self.statusMessageVisible = ko.computed(function() {
+            var message = this.message();
 
-        self.currentStatusMessage = null;
-        self.currentErrorMessage = null;
-
-        self.updateStatusMessage = (function(message) {
-            self.statusMessage(message);
-
-            if (self.currentStatusMessage != null) {
-                self.currentStatusMessage(message);
-            }
-        });
-
-        self.updateErrorMessage = (function(message) {
-            self.errorMessage(message);
-
-            if (self.currentErrorMessage != null) {
-                self.currentErrorMessage(message);
-            }
-        });
-        
-        self.statusMessageVisible = ko.computed(function () {
-            var message = this.statusMessage();
-
-            return !stringIsEmpty(message);
+            return !stringIsEmpty(message) && !self.isError();
         }, this);
 
-        self.errorMessageVisible = ko.computed(function () {
-            var message = self.errorMessage();
+        self.errorMessageVisible = ko.computed(function() {
+            var message = self.message();
 
-            return !stringIsEmpty(message);
+            return !stringIsEmpty(message) && self.isError();
         }, this);
 
-        this.updateData = (function (data) {
+        this.updateData = (function(data) {
             data.Key = self.key();
             data.ProviderKey = self.providerKey();
             data.FromLangKey = self.fromLangKey();
             data.ToLangKey = self.toLangKey();
             data.From = self.from();
             data.To = self.to();
-            data.StatusMessage = self.statusMessage();
-            data.ErrorMessage = self.errorMessage();
-            data.State = self.state();
-            data.CanBeExported = self.canBeExported();
+            data.IsOverridden = self.isOverridden();
         });
 
-        self.to.subscribe(function () {
-            self.save();
+        self.to.subscribe(function() {
+            if (self.disableSave() == false) {
+                self.save();
+            }
         });
     }
 
     function EditorViewModel() {
 
         var self = this;
+        self.dataController = new DataController();
 
         self.languages = ko.observableArray([]);
         self.resourceProviders = ko.observableArray([]);
         self.translations = ko.observableArray([]);
 
+        self.pageSize = ko.observable(0);
+
         self.fromLangKey = ko.observable();
         self.toLangKey = ko.observable();
         self.resourceProviderKey = ko.observable();
 
+        self.defaultProviderKey = ko.observable();
+
         self.totalTranslationsCount = ko.observable();
+        self.loadingTranslations = ko.observable(false);
 
         self.autoSaveTimeoutId = ko.observable();
         self.autoSaveInterval = ko.observable();
 
         self.searchTerm = ko.observable();
         self.hideTranslated = ko.observable(false);
+        self.showOverriddenOnly = ko.observable(false);
         self.pageNumber = ko.observable();
-        self.pageSize = ko.observable();
         self.allLanguagesKey = ko.observable('');
-        self.isSimpleMode = ko.observable(false);
+        self.isSimpleMode = ko.observable(true);
 
         self.filesToDownload = ko.observableArray();
 
@@ -312,6 +237,12 @@
 
         self.isAdvancedMode = ko.computed(function() {
             return !self.isSimpleMode();
+        });
+
+        self.resourceProviderText = ko.computed(function() {
+            var result = $("#resurceProviderSelect option[value='" + self.resourceProviderKey() + "']").text();
+
+            return result;
         });
 
         self.statusMessage = ko.observable('');
@@ -331,26 +262,49 @@
         self.fromFilter = ko.observable('');
         self.toFilter = ko.observable('');
 
-        /*self.exportFilteredTranslationsIsVisible = ko.observable(false);*/
+        self.importTranslationsUploadUrl = ko.observable(self.dataController.getImportTranslationsUploadUrl());
 
-        self.checkFilter = (function (filterValue) {
+        self.switchLangs = (function() {
+            var tempLangKey = self.fromLangKey();
+            self.fromLangKey(self.toLangKey());
+            self.toLangKey(tempLangKey);
+        });
+
+        self.hideTranslated.subscribe(function(value) {
+            if (value === true) {
+                self.showOverriddenOnly(false);
+            }
+        });
+
+        self.showOverriddenOnly.subscribe(function(value) {
+            if (value === true) {
+                self.hideTranslated(false);
+            }
+        });
+
+        self.importTranslations = (function() {
+            var form = $('#imprtTranslationsForm');
+
+            $.ajax(self.importTranslationsUploadUrl(), {
+                dataType: 'json',
+                contentType: "application/json",
+                files: form.find(':file'),
+                iframe: true,
+                processData: false,
+                type: 'Post'
+            }).done(function(data) {
+                self.handleMessage(data);
+                if (!data.IsError) {
+                    $('#importFile').val('');
+                }
+            });
+        });
+
+        self.checkFilter = (function(filterValue) {
             if (stringIsEmpty(filterValue)) {
                 return false;
             } else {
                 return true;
-            }
-        });
-
-        self.handleSaveError = (function (jqXHR, textStatus, errorThrown, translationItems) {
-            for (var i = 0; i < translationItems.length; i++) {
-
-                var translation = findTranslation(self.translations(), translationItems[i]);
-
-                if (translation != null) {
-                    translation.state('Error');
-                    translation.updateStatusMessage('');
-                    translation.updateErrorMessage(errorThrown);
-                }
             }
         });
 
@@ -360,23 +314,23 @@
             return self.checkFilter(filter);
         });
 
-        self.fromFilterApplied = ko.computed(function () {
+        self.fromFilterApplied = ko.computed(function() {
             var filter = self.fromFilter();
 
             return self.checkFilter(filter);
         });
 
-        self.toFilterApplied = ko.computed(function () {
+        self.toFilterApplied = ko.computed(function() {
             var filter = self.toFilter();
 
             return self.checkFilter(filter);
         });
 
-        self.loadedTranslationsCount = ko.computed(function () {
+        self.loadedTranslationsCount = ko.computed(function() {
             return this.translations().length;
         }, this);
 
-        self.loadMoreButtonVisible = ko.computed(function () {
+        self.loadMoreButtonVisible = ko.computed(function() {
             var loadedItemsCount = this.translations().length;
             var totalItemsCount = this.totalTranslationsCount();
 
@@ -393,7 +347,7 @@
             return anyFilterApplied;
         });
 
-        self.appliedFilterItemsCount = ko.computed(function () {
+        self.appliedFilterItemsCount = ko.computed(function() {
             if (self.anyFilterApplied()) {
                 var totalItemsCount = self.translations().length;
                 var visibleItemsCount = self.translationsToShow().length;
@@ -407,7 +361,7 @@
         });
 
         self.translationsToShow = ko.computed(function() {
-            
+
             var filteredTranslations = self.translations();
 
             if (self.anyFilterApplied()) {
@@ -428,50 +382,58 @@
             var currentOrderBy = self.orderBy();
             var currentOrderByIsAscending = self.orderByIsAscending();
 
-            filteredTranslations = filteredTranslations.sort(function (left, right) {
-                
+            filteredTranslations = filteredTranslations.sort(function(left, right) {
+
                 if (currentOrderByIsAscending) {
                     switch (currentOrderBy) {
-                        case 'Key':
-                            return self.sortByFieldAsc(left.key(), right.key());
-                            break;
-                        case 'From':
-                            return self.sortByFieldAsc(left.from(), right.from());
-                            break;
-                        case 'To':
-                            return self.sortByFieldAsc(left.to(), right.to());
-                            break;
-                        default:
-                            return 0;
+                    case 'Key':
+                        return self.sortByFieldAsc(left.key(), right.key());
+                        break;
+                    case 'From':
+                        return self.sortByFieldAsc(left.from(), right.from());
+                        break;
+                    case 'To':
+                        return self.sortByFieldAsc(left.to(), right.to());
+                        break;
+                    default:
+                        return 0;
                     }
                 } else {
                     switch (currentOrderBy) {
-                        case 'Key':
-                            return self.sortByFieldDesc(left.key(), right.key());
-                            break;
-                        case 'From':
-                            return self.sortByFieldDesc(left.from(), right.from());
-                            break;
-                        case 'To':
-                            return self.sortByFieldDesc(left.to(), right.to());
-                            break;
-                        default:
-                            return 0;
+                    case 'Key':
+                        return self.sortByFieldDesc(left.key(), right.key());
+                        break;
+                    case 'From':
+                        return self.sortByFieldDesc(left.from(), right.from());
+                        break;
+                    case 'To':
+                        return self.sortByFieldDesc(left.to(), right.to());
+                        break;
+                    default:
+                        return 0;
                     }
                 }
-            } );
+            });
 
             return filteredTranslations;
         });
 
-        self.isExportFilteredVisible = function () {
+        self.settingsAreLoaded = ko.observable(false);
+
+        self.pageSize.subscribe(function() {
+            if (self.settingsAreLoaded()) {
+                self.saveSettings();
+            }
+        });
+
+        self.isExportFilteredVisible = function() {
             var visibleTranslations = self.translationsToShow();
 
             if (visibleTranslations.length > 0) {
                 var translationsThatCanBeExported = [];
 
-                $(visibleTranslations).each(function (index, item) {
-                    if (item.canBeExported() == true) {
+                $(visibleTranslations).each(function(index, item) {
+                    if (item.isOverridden() == true) {
                         translationsThatCanBeExported.push(item);
                     }
                 });
@@ -485,20 +447,26 @@
         };
 
         self.sortByFieldAsc = function(leftField, rightField) {
-            return leftField == rightField ? 0 : (leftField < rightField ? -1 : 1);
+            var leftFieldLower = leftField.toLowerCase();
+            var rightFieldLower = rightField.toLowerCase();
+
+            return leftFieldLower == rightFieldLower ? 0 : (leftFieldLower < rightFieldLower ? - 1 : 1);
         };
 
-        self.sortByFieldDesc = function (leftField, rightField) {
-            return leftField == rightField ? 0 : (leftField > rightField ? -1 : 1);
+        self.sortByFieldDesc = function(leftField, rightField) {
+            var leftFieldLower = leftField.toLowerCase();
+            var rightFieldLower = rightField.toLowerCase();
+
+            return leftFieldLower == rightFieldLower ? 0 : (leftFieldLower > rightFieldLower ? -1 : 1);
         };
 
-        self.isOrderedByField = function (field) {
+        self.isOrderedByField = function(field) {
             var currentOrderBy = self.orderBy();
 
             return currentOrderBy == field;
         };
 
-        self.orderedByKeyAsc = ko.computed(function () {
+        self.orderedByKeyAsc = ko.computed(function() {
             return self.isOrderedByField('Key') && self.orderByIsAscending();
         });
         self.orderedByFromAsc = ko.computed(function() {
@@ -507,17 +475,17 @@
         self.orderedByToAsc = ko.computed(function() {
             return self.isOrderedByField('To') && self.orderByIsAscending();
         });
-        self.orderedByKeyDesc = ko.computed(function () {
+        self.orderedByKeyDesc = ko.computed(function() {
             return self.isOrderedByField('Key') && !self.orderByIsAscending();
         });
-        self.orderedByFromDesc = ko.computed(function () {
+        self.orderedByFromDesc = ko.computed(function() {
             return self.isOrderedByField('From') && !self.orderByIsAscending();
         });
-        self.orderedByToDesc = ko.computed(function () {
+        self.orderedByToDesc = ko.computed(function() {
             return self.isOrderedByField('To') && !self.orderByIsAscending();
         });
 
-        self.filterTranslation = (function (translationValue, filterValue) {
+        self.filterTranslation = (function(translationValue, filterValue) {
             if (translationValue == null) {
                 return false;
             }
@@ -541,42 +509,89 @@
 
         self.filteredTranslations = ko.observableArray([]);
 
-        self.dataController = new DataController();
+        self.init = (function() {
+            self.loadResourceMessages();
 
-        self.init = (function () {
-            self.loadConfiguration();
             self.loadLanguages();
             self.loadResourceProviders();
+
+            if (window.resourceEditorConfig == undefined) {
+                alert(self.resourceMessages.UnableToLoadConfiguration);
+            }
+
+            self.loadSettings();
 
             self.clearAllFilters();
             self.resetOrder();
         });
 
-        self.loadLanguages = (function () {
+        self.loadLanguages = (function() {
             self.dataController.loadLanguages(self.languages);
         });
 
-        self.loadConfiguration = (function () {
-            if (window.resourceEditorConfig == undefined) {
-                alert('Error: Unable to load configuration.');
-            }
-
-            self.pageSize(window.resourceEditorConfig.pageSize);
-            self.isSimpleMode(window.resourceEditorConfig.isSimpleMode);
-            self.autoSaveInterval(window.resourceEditorConfig.autoSaveInterval);
-            self.allLanguagesKey(window.resourceEditorConfig.allLanguagesKey);
-
-            self.resetOrder();
+        self.loadResourceMessages = (function() {
+            self.dataController.loadResourceMessages(function(data) {
+                self.resourceMessages = data.Messages;
+            });
         });
 
-        self.changeMode = (function () {
+        self.loadSettings = (function() {
+            self.dataController.loadSettings(function(loadedSettings) {
+                self.pageSize(loadedSettings.PageSize);
+                self.isSimpleMode(loadedSettings.IsSimpleMode);
+
+                self.fromLangKey(loadedSettings.DefaultFrom);
+                self.toLangKey(loadedSettings.DefaultTo);
+
+                self.resourceProviderKey(loadedSettings.DefaultResourceProvider);
+                self.defaultProviderKey(loadedSettings.DefaultResourceProvider);
+
+                self.settingsAreLoaded(true);
+            }, self.handleServerError);
+
+            self.autoSaveInterval(window.resourceEditorConfig.autoSaveInterval);
+            self.allLanguagesKey(window.resourceEditorConfig.allLanguagesKey);
+        });
+
+        self.saveSettings = (function() {
+
+            var settings = {
+                pageSize: self.pageSize()
+            };
+
+            self.dataController.saveSettings(settings, function(data) {
+                    self.handleMessage(data);
+            },
+            self.handleServerError);
+        });
+
+        self.switchMode = (function() {
             var isSimple = self.isSimpleMode();
 
-            self.isSimpleMode(!isSimple);
+            var advancedPanel = $('.advanced-panel');
+            var resultsBlock = $('.results');
 
-            /*if (isSimple) {
-                self.exportFilteredTranslationsIsVisible(self.isExportFilteredVisible());
-            }*/
+            if (isSimple) {
+
+                resultsBlock.animate({ width: "79%" }, 500);
+                advancedPanel.animate({ width: "21%" }, 500);
+            }
+            else {
+                advancedPanel.animate({ width: "0" }, 500);
+                resultsBlock.animate({ width: "100%" }, 500);
+            }
+
+            self.isSimpleMode(!isSimple);
+        });
+
+        self.handleMessage = (function(message) {
+            if (message.IsError) {
+                self.errorMessage(message.Message);
+                self.statusMessage('');
+            } else {
+                self.errorMessage('');
+                self.statusMessage(message.Message);
+            }
         });
 
         self.resetOrder = (function() {
@@ -584,11 +599,11 @@
             self.orderByIsAscending(window.resourceEditorConfig.defaultOrderByIsAscending);
         });
 
-        self.loadResourceProviders = (function () {
+        self.loadResourceProviders = (function() {
             self.dataController.loadResourceProviders(self.resourceProviders);
         });
 
-        self.loadTranslations = (function () {
+        self.loadTranslations = (function() {
 
             if (self.confirmLoad()) {
 
@@ -596,10 +611,111 @@
 
                 self.translations.removeAll();
 
-                self.dataController.LoadTranslations(self);
+                self.performTranslationsLoad();
 
                 self.autosaveTranslations();
             }
+        });
+
+        self.handleTranslationMessage = (function(dataItem) {
+            $(self.translations()).each(function(idx, targetItem) {
+                if (targetItem.key() == dataItem.Key) {
+                    targetItem.isError(dataItem.IsError);
+                    targetItem.message(dataItem.Message);
+                    targetItem.isOverridden(dataItem.IsOverridden);
+                    targetItem.disableSave(true);
+                    targetItem.to(dataItem.To);
+                    targetItem.disableSave(false);
+                }
+            });
+
+            self.handleMessage(dataItem);
+        });
+
+        self.handleServerError = (function (jqXHR, textStatus, errorThrown) {
+            var message = '';
+
+            if (jqXHR != null && !stringIsEmpty(jqXHR.responseText)) {
+                if (/^[\],:{}\s]*$/.test(jqXHR.responseText.replace(/\\["\\\/bfnrtu]/g, '@').
+                    replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']').
+                    replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
+
+                    var exception = JSON.parse(jqXHR.responseText);
+
+                    if (exception != null) {
+                        message = exception.Message;
+                    }
+                }
+            }
+
+            if (stringIsEmpty(message)) {
+                message = errorThrown;
+            }
+
+            if (stringIsEmpty(message)) {
+                message = self.resourceMessages.ServerIsUnavailable;
+            }
+
+            self.statusMessage('');
+            self.errorMessage(message);
+        });
+
+        self.performTranslationsLoad = (function() {
+            self.loadingTranslations(true);
+
+            var requestUrl = "translations?providerKey=" + self.resourceProviderKey() + "&fromLangKey=" + self.fromLangKey() + "&toLangKey=" + self.toLangKey() + "&page=" + self.pageNumber() + "&pageSize=" + self.pageSize() + "&searchTerm=" + self.searchTerm() + "&hideTranslated=" + self.hideTranslated() + "&overriddenOnly=" + self.showOverriddenOnly() + "&orderBy=" + self.orderBy() + "&orderByIsAscending=" + self.orderByIsAscending();
+
+            self.dataController.loadTranslations(requestUrl, function (data) {
+
+                    var items = $.map(data.Items, function(dataItem) {
+
+                        var translation = new Translation(dataItem);
+
+                        translation.save = function() {
+                            translation.message(self.resourceMessages.SavingTranslation);
+
+                            self.dataController.saveTranslation(translation,
+                                function(translationItem) { // mappingFunc
+                                    var translationData = {};
+                                    translationItem.updateData(translationData);
+                                    return translationData;
+                                },
+                                function(x) { // saveSucceededFunc
+                                    $(x).each(function(index, item) {
+                                        self.handleTranslationMessage(item);
+                                    });
+                                },
+                                function(jqXHR, textStatus, errorThrown, translationItems) {
+                                    for (var i = 0; i < translationItems.length; i++) {
+                                        translationItems[i].Message = errorThrown;
+                                        translationItems[i].IsError = true;
+                                        self.handleTranslationMessage(translationItems[i]);
+                                    }
+                                    self.handleServerError(jqXHR, textStatus, errorThrown);
+                                }); // saveFailedFunc
+                        };
+
+                        return translation;
+                    });
+
+                    var numberOfItemsToBeShown = data.Items.length + self.numberOfTranslationsToBeShown();
+                    self.numberOfTranslationsToBeShown(numberOfItemsToBeShown);
+
+                    $(items).each(function(index, item) {
+                        self.translations.push(item);
+                    });
+
+                    self.totalTranslationsCount(data.Paging.TotalItemsCount);
+
+                    self.pageNumber(data.Paging.PageIndex);
+
+                    self.loadingTranslations(false);
+                    self.handleMessage(data);
+                },
+                function(jqXHR, textStatus, errorThrown) {
+                    self.loadingTranslations(false);
+                    self.handleServerError(jqXHR, textStatus, errorThrown);
+                });
         });
 
         self.confirmLoad = (function() {
@@ -608,7 +724,7 @@
             var notSavedTranslationsCount = notSavedTranslations.length;
 
             if (notSavedTranslationsCount > 0) {
-                var message = 'WARNING! There are ' + notSavedTranslationsCount + ' translation(s) that are not saved yet. Press OK to load translations, or Cancel to let us keep trying to save these items.';
+                var message = self.resourceMessages.AutoSaveWarning.replace("{0}", notSavedTranslationsCount);
 
                 var result = confirm(message);
 
@@ -618,7 +734,7 @@
             return true;
         });
 
-        self.autosaveTranslations = (function () {
+        self.autosaveTranslations = (function() {
             var timeoutId = self.autoSaveTimeoutId();
 
             if (timeoutId != undefined) {
@@ -632,8 +748,7 @@
             self.autoSaveTimeoutId(timeoutId);
         });
 
-        self.autosave = (function () {
-
+        self.autosave = (function() {
             var notSavedTranslations = self.getNotSavedTranslations();
 
             for (var i = 0; i < notSavedTranslations.length; i++) {
@@ -644,33 +759,32 @@
         self.getNotSavedTranslations = (function() {
             var notSavedTranslations = self.translations();
 
-            notSavedTranslations = self.filterField(true, notSavedTranslations, function (translation) {
-                var errorMessage = translation.errorMessage();
-
-                return !stringIsEmpty(errorMessage);
+            notSavedTranslations = self.filterField(true, notSavedTranslations, function(translation) {
+                return translation.isError();
             });
 
             return notSavedTranslations;
         });
 
-        self.loadMoreTranslations = (function () {
+        self.loadMoreTranslations = (function() {
             var pageNumber = self.pageNumber() + 1;
             self.pageNumber(pageNumber);
 
-            self.dataController.LoadTranslations(self);
+            self.performTranslationsLoad();
         });
 
-        self.clearAllFilters = (function () {
+        self.clearAllFilters = (function() {
             self.resetPaging();
             self.resetOrder();
 
             self.clearSearchTerm();
             self.hideTranslated(false);
+            self.showOverriddenOnly(false);
 
             self.clearClientFilters();
         });
 
-        self.resetFilters = (function () {
+        self.resetFilters = (function() {
             self.clearAllFilters();
 
             self.loadTranslations();
@@ -686,7 +800,7 @@
             self.searchTerm('');
         });
 
-        self.resetPaging = (function () {
+        self.resetPaging = (function() {
             self.numberOfTranslationsToBeShown(0);
             self.pageNumber(1);
         });
@@ -694,24 +808,24 @@
         self.clearFilterByKey = (function() {
             self.keyFilter('');
         });
-        self.clearFilterByFrom = (function () {
+        self.clearFilterByFrom = (function() {
             self.fromFilter('');
         });
-        self.clearFilterByTo = (function () {
+        self.clearFilterByTo = (function() {
             self.toFilter('');
         });
 
 
-        self.sortByKey = (function () {
+        self.sortByKey = (function() {
             self.sort('Key');
         });
-        self.sortByFrom = (function () {
+        self.sortByFrom = (function() {
             self.sort('From');
         });
-        self.sortByTo = (function () {
+        self.sortByTo = (function() {
             self.sort('To');
         });
-        self.sortByStatus = (function () {
+        self.sortByStatus = (function() {
             alert('Not implemented yet');
         });
 
@@ -728,65 +842,83 @@
         });
 
         self.exportFilteredTranslations = (function() {
-            var url = "/GetTranslationsForExport?toLangKey=" + self.toLangKey();
-
             var requestData = [];
 
-            $(self.translationsToShow()).each(function (index, item) {
-                if (item.canBeExported()) {
+            $(self.translationsToShow()).each(function(index, item) {
+                if (item.isOverridden()) {
                     var key = item.key();
                     requestData.push(key);
                 }
             });
 
-            self.dataController.getDownloadLinks(url, requestData, self.filesToDownload, function (item) {
+            self.dataController.getDownloadLinks('getTranslationsForExport', self.toLangKey(), requestData, self.filesToDownload, function(item) {
+                    debugger;
+                    var downloadMessage = new DownloadMessage(item);
 
-                var downloadMessage = new DownloadMessage(item);
-
-                return downloadMessage;
-            },
-            self.downloadManager
+                    return downloadMessage;
+                },
+                self.downloadManager,
+                self.handleServerError
             );
         });
 
-        self.downloadManager = (function () {
-
-            $(self.filesToDownload()).each(function (index, item) {
-                
-                if (stringIsEmpty(item.errorMessage())  && !stringIsEmpty(item.downloadUrl())) {
-                    var ifr = $('<iframe/>', {
-                        src: item.downloadUrl(),
-                        id : 'iframe_' + guid(),
-                        style: 'height:0;width:0;display:none',
-                        ready: function () {
-
-                            self.statusMessage(item.statusMessage());
-
-                            return true;
-                        }
-                    });
-
-                    ifr.attr('data-downloadUrl', item.downloadUrl());
-
-                    $('body').append(ifr);
-                } else {
-                    self.errorMessage(item.errorMessage());
-                }
-            });
-        });
-
-        self.exportAllTranslations = (function () {
-            var url = "/GetTranslationsForExport?toLangKey=" + self.allLanguagesKey();
-            
-            self.dataController.getDownloadLinks(url, null, self.filesToDownload, function(item) {
+        self.exportAllTranslations = (function() {
+            self.dataController.getDownloadLinks('getTranslationsForExport', self.allLanguagesKey(), null, self.filesToDownload, function (item) {
+                debugger;
                 var downloadMessage = new DownloadMessage(item);
 
                 return downloadMessage;
-            }, self.downloadManager);
 
+            }, self.downloadManager,
+            self.handleServerError);
+
+        });
+
+        self.downloadManager = (function (downloadContent) {
+            var blob = null;
+
+            if (downloadContent.ContentType == "application/zip") {
+
+                var sliceSize = 512;
+
+                var byteCharacters = atob(downloadContent.Content);
+                var byteArrays = [];
+
+                for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+                    var slice = byteCharacters.slice(offset, offset + sliceSize);
+
+                    var byteNumbers = new Array(slice.length);
+                    for (var i = 0; i < slice.length; i++) {
+                        byteNumbers[i] = slice.charCodeAt(i);
+                    }
+
+                    var byteArray = new Uint8Array(byteNumbers);
+
+                    byteArrays.push(byteArray);
+                }
+
+                blob = new Blob(byteArrays, { type: downloadContent.Content });
+            } else {
+                blob = new Blob([downloadContent.Content], { type: downloadContent.ContentType });
+            }
+
+            saveAs(blob, downloadContent.FileName);
+        });
+
+        self.leaveFocusOnEnter = (function(viewModel, event) {
+            var keyCode = event.which || event.keyCode;
+
+            if (keyCode == 13) {
+                event.target.blur();
+                return false;
+            }
+
+            return true;
         });
 
         self.init();
     }
+
+    ko.applyBindings(new EditorViewModel());
 
 })(jQuery);

@@ -1,4 +1,5 @@
-﻿@model Creuna.EPiCodeFirstTranslations.Presentation.ViewModels.Pages.FrontPageViewModel
+﻿@using Creuna.EPiCodeFirstTranslations.Presentation.Enums
+@model Creuna.EPiCodeFirstTranslations.Presentation.ViewModels.Pages.FrontPageViewModel
 
 @{
     ViewBag.Title = "title";
@@ -11,4 +12,16 @@
 <p>Ok label is " @Html.Translation(t => t.Labels.Ok)"</p>
 <p>Save label is "@Html.Translation(t => t.Labels.Save)"</p>
 <p>Cancel label is "@{Html.RenderTranslation(t => t.Labels.Cancel);}"</p>
-<p>@Html.TranslationFormat(t=>t.Formats.SearchCount, 10) </p>
+<p>@Html.TranslationFormat(t => t.Formats.SearchCount, 10) </p>
+
+<h2>Enum Translations</h2>
+
+<h4>Gender</h4>
+<p>Male is: "@Html.TranslationForEnumValue(Gender.Male)"</p>
+<p>Female is: "@Html.TranslationForEnumValue(Gender.Female)"</p>
+
+<h4>Position</h4>
+<p>Top is: "@Html.TranslationForEnumValue(Position.Top)"</p>
+<p>Bottom is: "@Html.TranslationForEnumValue(Position.Bottom)"</p>
+<p>TopLeft is: "@Html.TranslationForEnumValue(Position.TopLeft)"</p>
+<p>TopRight is: "@Html.TranslationForEnumValue(Position.TopRight)"</p>

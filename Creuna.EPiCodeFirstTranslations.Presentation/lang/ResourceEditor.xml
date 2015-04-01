@@ -1,61 +1,79 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 
 <languages>
-    <language name="English" id="EN">
-        <resourceEditor>
-            <searchPanel>
-                <choose>Choose...</choose>
-                <from>From</from>
-                <to>To</to>
-                <resourceProvider>Resources provider</resourceProvider>
-                <simple>simple</simple>
-                <advanced>advanced</advanced>
-                <hideTranslated>Hide Translated</hideTranslated>
-                <searchPlaceholder>Search</searchPlaceholder>
-                <clear>clear</clear>
-                <loadTranslations>Load</loadTranslations>
-                <resetAllFilters>Reset all filters</resetAllFilters>
-            </searchPanel>
-            <advancedMode>
-                <import>Import</import>
-                <exportAll>Export All</exportAll>
-                <exportFiltered>Export Filtered</exportFiltered>
-            </advancedMode>
-            <translations>
-                <common>
-                    <searchPlaceholder>Search</searchPlaceholder>
-                    <clear>clear</clear>
-                    <error>Error</error>
-                </common>
-                <columnHeaders>
-                    <key>Key</key>
-                    <from>From</from>
-                    <to>To</to>
-                    <status>Status</status>
-                </columnHeaders>
-                <loadMore>Load More</loadMore>
-                <itemsLoaded>items are loaded out of</itemsLoaded>
-                <appliedFilters>Applied filters</appliedFilters>
-                <itemsAreShown>items are shown</itemsAreShown>
-                <clientFiltersApplied>
-                    <key>Key</key>
-                    <from>From</from>
-                    <to>To</to>
-                </clientFiltersApplied>
-            </translations>
-            <messages>
-                <DownloadingTranlsationsForLanguageFinishedFormat>Downloading tranlsations for {0} finished</DownloadingTranlsationsForLanguageFinishedFormat>
-                <AllLanguages>All Languages</AllLanguages>
-                <NoTranslationsFound>No translations found</NoTranslationsFound>
-                <ExportTranslationsQueryIsNotDefined>Export Translations Query is not defined</ExportTranslationsQueryIsNotDefined>
-                <SelectFromLanguage>Please choose 'From' language</SelectFromLanguage>
-                <SelectToLanguage>Please choose 'To' language</SelectToLanguage>
-                <SelectFromAndToLanguages>Please choose 'From' and 'To' languages</SelectFromAndToLanguages>
-                <NothingToExportForSelectedLanguageFormat>There is nothing to export for {0} language</NothingToExportForSelectedLanguageFormat>
-                <NothingToExport>There is nothing to export</NothingToExport>
-                <All>All</All>
-                <Saved>Saved</Saved>
-            </messages>
-        </resourceEditor>
-    </language>
+  <language name="English" id="EN">
+    <resourceEditor>
+      <searchPanel>
+        <choose>Choose...</choose>
+        <from>From</from>
+        <to>To</to>
+        <swapLangs>Swap languages</swapLangs>
+        <resourceProvider>Resources provider</resourceProvider>
+        <simple>simple</simple>
+        <advanced>Advanced</advanced>
+        <hideTranslated>Hide Translated</hideTranslated>
+        <showOverriddenOnly>Show overridden</showOverriddenOnly>
+        <searchPlaceholder>Search</searchPlaceholder>
+        <clear>clear</clear>
+        <loadTranslations>Load</loadTranslations>
+        <resetAllFilters>Reset all filters</resetAllFilters>
+      </searchPanel>
+      <advancedMode>
+        <importCaption>Import</importCaption>
+        <import>Import</import>
+        <exportCaption>Export</exportCaption>
+        <settingsCaption>Settings</settingsCaption>
+        <exportAll>Export All</exportAll>
+        <exportFiltered>Export Filtered</exportFiltered>
+        <numberOfItemsOnPage># of items on the page</numberOfItemsOnPage>
+      </advancedMode>
+      <translations>
+        <common>
+          <searchPlaceholder>Search</searchPlaceholder>
+          <clear>clear</clear>
+          <error>Error</error>
+        </common>
+        <columnHeaders>
+          <key>Key</key>
+          <from>From</from>
+          <to>To</to>
+          <status>Status</status>
+        </columnHeaders>
+        <loadMore>Load More</loadMore>
+        <itemsLoaded>items are loaded out of</itemsLoaded>
+        <appliedFilters>Applied filters</appliedFilters>
+        <itemsAreShown>items are shown</itemsAreShown>
+        <clientFiltersApplied>
+          <key>Key</key>
+          <from>From</from>
+          <to>To</to>
+          <resourceProvider>Resource Provider</resourceProvider>
+        </clientFiltersApplied>
+      </translations>
+      <messages>
+        <AllLanguages>All Languages</AllLanguages>
+        <NoTranslationsFound>No translations found</NoTranslationsFound>
+        <ExportTranslationsQueryIsNotDefined>Export Translations Query is not defined</ExportTranslationsQueryIsNotDefined>
+        <SelectFromLanguage>Please choose 'From' language</SelectFromLanguage>
+        <SelectToLanguage>Please choose 'To' language</SelectToLanguage>
+        <SelectFromAndToLanguages>Please choose 'From' and 'To' languages</SelectFromAndToLanguages>
+        <NothingToExportForSelectedLanguageFormat>There is nothing to export for {0} language</NothingToExportForSelectedLanguageFormat>
+        <NothingToExport>There is nothing to export</NothingToExport>
+        <UnsupportedMediaType>Unsupported media type</UnsupportedMediaType>
+        <AllResourceProviders>All Resource Providers</AllResourceProviders>
+        <Saved>Saved</Saved>
+        <NoTransloationsToImportFound>No translations to import found</NoTransloationsToImportFound>
+        <ImportFinished>Import finished; </ImportFinished>
+        <FileWithTranslationsNotFound>File with translations not found</FileWithTranslationsNotFound>
+        <UnableToParseTranslations>Unable to parse translations</UnableToParseTranslations>
+        <TranslationsForLanguageImportedFormat>{0} translations were imported for '{1}' language</TranslationsForLanguageImportedFormat>
+        <UnableToSaveTranslationsForLanguageFormat>Unable to save translations for '{0}' language;  Error Details: {1}</UnableToSaveTranslationsForLanguageFormat>
+        <SettingsWereSavedSuccessfully>Settings were saved.</SettingsWereSavedSuccessfully>
+        <UnableToLoadConfiguration>Unable to load configuration</UnableToLoadConfiguration>
+        <AutoSaveWarningFormat>WARNING! There are {0} translation(s) that are not saved yet. Press OK to load translations, or Cancel to let us keep trying to save these items.</AutoSaveWarningFormat>
+        <ServerIsUnavailable>Server is unavailable</ServerIsUnavailable>
+        <SavingTranslation>Saving</SavingTranslation>
+      </messages>
+    </resourceEditor>
+  </language>
 </languages>

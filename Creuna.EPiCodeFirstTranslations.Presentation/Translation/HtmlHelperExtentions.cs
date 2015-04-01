@@ -2,7 +2,6 @@
 using System.Linq.Expressions;
 using System.Web;
 using System.Web.Mvc;
-using Creuna.EPiCodeFirstTranslations;
 using EPiServer.ServiceLocation;
 
 namespace Creuna.EPiCodeFirstTranslations.Presentation.Translation
@@ -32,6 +31,16 @@ namespace Creuna.EPiCodeFirstTranslations.Presentation.Translation
         public static void RenderTranslationFormat(this HtmlHelper htmlHelper, Expression<Func<Translations, string>> translationPathExpression, params object[] args)
         {
             TranslationContentRenderer.RenderTranslationFormat(htmlHelper, translationPathExpression, args);
+        }
+
+        public static IHtmlString TranslationForEnumValue(this HtmlHelper htmlHelper, Enum value)
+        {
+            return TranslationContentRenderer.TranslationForEnumValue(htmlHelper, value);
+        }
+
+        public static void RenderTranslationForEnumValue(this HtmlHelper htmlHelper, Enum value)
+        {
+            TranslationContentRenderer.RenderTranslationForEnumValue(htmlHelper, value);
         }
     }
 }

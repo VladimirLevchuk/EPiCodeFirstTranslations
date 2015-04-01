@@ -1,80 +1,122 @@
-﻿@using EPiServer.Shell.Web.Mvc.Html
+﻿@using Creuna.ResourceEditor.App_Start
+@using EPiServer.Shell.Web.Mvc.Html
 @model Creuna.ResourceEditor.ViewModels.ResourceEditorViewModel
 
 @{
     ViewBag.Title = "Resource Editor";
 }
 
-<script type="text/javascript" language="javascript">
-    $(function () {
-        var resourceEditorConfig = {};
+@section scripts
+{
+    <script type="text/javascript" language="javascript">
 
-        resourceEditorConfig.pageSize = @Model.PageSize;
-        resourceEditorConfig.isSimpleMode = '@Model.IsSimpleMode'.toLowerCase() === 'true';
+        /// <reference path="~/modules/Creuna.ResourceEditor/ClientResources/Scripts/Libs/jquery-1.8.3.j"/>
+        /// <reference path="~/modules/Creuna.ResourceEditor/ClientResources/Scripts/Libs/knockout-3.1.0.js" />
+        /// <reference path="~/modules/Creuna.ResourceEditor/ClientResources/Scripts/editor.js" />
+        
+        (function() {
+            var resourceEditorConfig = {};
 
-        resourceEditorConfig.defaultOrderBy = '@Model.SortOptions.OrderBy';
-        resourceEditorConfig.defaultOrderByIsAscending = '@Model.SortOptions.Ascending'.toLowerCase() === 'true';
+            resourceEditorConfig.defaultOrderBy = '@Model.SortOptions.OrderBy';
+            resourceEditorConfig.defaultOrderByIsAscending = '@Model.SortOptions.Ascending'.toLowerCase() === 'true';
 
-        resourceEditorConfig.autoSaveInterval = @Model.AutoSaveInterval;
-        resourceEditorConfig.allLanguagesKey = '@Model.AllLanguagesKey';
+            resourceEditorConfig.autoSaveInterval = @Model.AutoSaveInterval;
+            resourceEditorConfig.allLanguagesKey = '@Model.AllLanguagesKey';
 
-        window.resourceEditorConfig = resourceEditorConfig;
-    });
+            window.resourceEditorConfig = resourceEditorConfig;
 
-</script>
+        })(window);
+
+    </script>
+
+    @Scripts.Render(BundleConfig.EditorScriptsBundlePath)
+}
 
 <div class="translation-block" data-bind="css: {advanced : isAdvancedMode}">
     <div class="header">
         <div class="container">
             <div class="selection cf">
-                <div class="select-box box">
-                    <label for="fromLangSelect">@Html.Translate("/resourceEditor/searchPanel/from")</label>
-                    <select id="fromLangSelect" data-bind="options: languages,optionsText: 'name', optionsValue: 'key', value: fromLangKey, optionsCaption: '@Html.Translate("/resourceEditor/searchPanel/choose")'"></select>
-                </div>
-                <div class="select-box box">
-                    <label for="toLangselect">@Html.Translate("/resourceEditor/searchPanel/to")</label>
-                    <select id="toLangselect" data-bind="options: languages,optionsText: 'name', optionsValue: 'key', value: toLangKey, optionsCaption: '@Html.Translate("/resourceEditor/searchPanel/choose")'"></select>
-                </div>
-                <div class="box simple-advanced">
-                    <span data-bind="click: changeMode, css: { active: isSimpleMode }">@Html.Translate("/resourceEditor/searchPanel/simple")</span>
-                    <span class="separator" data-bind="css: { active: isAdvancedMode }">|</span>
-                    <span data-bind="click: changeMode, css: { active: isAdvancedMode }">@Html.Translate("/resourceEditor/searchPanel/advanced")</span>
-                </div>
-                <div class="resources-provider" data-bind="css: { advanced: isAdvancedMode }">
+                <div class="fromToBlock">
                     <div class="select-box box">
-                        <label for="resurceProviderSelect">@Html.Translate("/resourceEditor/searchPanel/resourceProvider")</label>
-                        <select id="resurceProviderSelect" data-bind="options: resourceProviders,optionsText: 'name', optionsValue: 'key', value: resourceProviderKey">
-                        </select>
+                        <label for="fromLangSelect">@Html.Translate("/resourceEditor/searchPanel/from")</label>
+                        <select id="fromLangSelect" data-bind="options: languages,optionsText: 'name', optionsValue: 'key', value: fromLangKey, optionsCaption: '@Html.Translate("/resourceEditor/searchPanel/choose")'"></select>
                     </div>
-                    <div class="box todo">
-                        <button class="btn">@Html.Translate("/resourceEditor/advancedMode/import")</button>
+                    <div class="select-box box">
+                        <button class="btn invert" data-bind="click: switchLangs" title="@Html.Translate("/resourceEditor/searchPanel/swapLangs")"></button>
                     </div>
-                    <div class="box">
-                        <button class="btn" data-bind="click: exportAllTranslations">@Html.Translate("/resourceEditor/advancedMode/exportAll")</button>
+                    <div class="select-box box">
+                        <label for="toLangselect">@Html.Translate("/resourceEditor/searchPanel/to")</label>
+                        <select id="toLangselect" data-bind="options: languages,optionsText: 'name', optionsValue: 'key', value: toLangKey, optionsCaption: '@Html.Translate("/resourceEditor/searchPanel/choose")'"></select>
                     </div>
-                    <div class="box">
-                        <button class="btn" data-bind="click: exportFilteredTranslations">@Html.Translate("/resourceEditor/advancedMode/exportFiltered")</button>
+                    <div class="box cheker-box">
+                        <input id="hideTranslated" type="checkbox" data-bind="checked: hideTranslated" />
+                        <label for="hideTranslated">@Html.Translate("/resourceEditor/searchPanel/hideTranslated")</label>
+                    </div>
+                    <div class="box cheker-box">
+                        <input id="showOverridenOnly" type="checkbox" data-bind="checked: showOverriddenOnly" />
+                        <label for="showOverridenOnly">@Html.Translate("/resourceEditor/searchPanel/showOverriddenOnly")</label>
+                    </div>
+                    <div class="box" data-bind="click: resetFilters">
+                        <button class="btn reset">@Html.Translate("/resourceEditor/searchPanel/resetAllFilters")</button>
                     </div>
                 </div>
+                <div class="simple-advanced">
+                    <span data-bind="click: switchMode, css: { active: isAdvancedMode }">@Html.Translate("/resourceEditor/searchPanel/advanced")</span>
+                </div>
+                <div class="advanced-panel">
+                    <div class="panel-wraper">
+                        <fieldset>
+                            <legend>@Html.Translate("/resourceEditor/advancedMode/exportCaption")</legend>
+                            <div class="export">
+                                <div class="export-buttons">
+                                    <button class="btn export" data-bind="click: exportAllTranslations">@Html.Translate("/resourceEditor/advancedMode/exportAll")</button>
+                                    <button class="btn export" data-bind="click: exportFilteredTranslations">@Html.Translate("/resourceEditor/advancedMode/exportFiltered")</button>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset>
+                            <legend>@Html.Translate("/resourceEditor/advancedMode/importCaption")</legend>
+                            <div class="import">
+                                <div id="uploadContainer">
+                                    <form id="imprtTranslationsForm">
+                                        <div class="upload-wraper">
+                                            <input class="upload-input" type="file" id="importFile" name="importFile">
+                                        </div>
 
+                                        <button type="submit" class="btn import" data-bind="click: importTranslations">@Html.Translate("/resourceEditor/advancedMode/import")</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset>
+                            <legend>@Html.Translate("/resourceEditor/advancedMode/settingsCaption")</legend>
+                            <div class="qSettings">
+                                <div class="setting-item">
+                                    <label for="showItems">@Html.Translate("/resourceEditor/advancedMode/numberOfItemsOnPage")</label>
+                                    <input class="itemsOnPage numberOnly" type="text" id="showItems" data-bind="value: pageSize, event:{ keypress: leaveFocusOnEnter }" />
+                                </div>
+                                <div class="setting-item">
+                                    <div class="clear">
+                                        <label for="resurceProviderSelect">@Html.Translate("/resourceEditor/searchPanel/resourceProvider")</label>
+                                    </div>
+                                    <select id="resurceProviderSelect" data-bind="options: resourceProviders,optionsText: 'name', optionsValue: 'key', value: resourceProviderKey"></select>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
             </div>
 
             <div class="cf search-row">
                 <div class="column1">
-                    <div class="box cheker-box">
-                        <input id="checker1" type="checkbox" data-bind="checked: hideTranslated" />
-                        <label for="checker1">@Html.Translate("/resourceEditor/searchPanel/hideTranslated")</label>
-                    </div>
                     <div class="box search-box">
                         <input placeholder="@Html.Translate("/resourceEditor/searchPanel/searchPlaceholder")" class="search-field" type="text" data-bind="value: searchTerm" />
                         <button class="search-field-cleaner" data-bind="click: clearSearchTerm">@Html.Translate("/resourceEditor/searchPanel/clear")</button>
                     </div>
-                    <div class="box">
-                        <button class="btn search" type="submit" data-bind="click: loadTranslations">@Html.Translate("/resourceEditor/searchPanel/loadTranslations")</button>
+                    <div class="box" data-bind="css: {loading: loadingTranslations}">
+                        <button class="btn search" type="submit" data-bind="click: loadTranslations,">@Html.Translate("/resourceEditor/searchPanel/loadTranslations")</button>
                     </div>
-                    <div class="box" data-bind="click: resetFilters">
-                        <button class="btn">@Html.Translate("/resourceEditor/searchPanel/resetAllFilters")</button>
-                    </div>
+                    
                 </div>
                 <div class="column2" data-bind="visible: errorMessageVisible">
                     <div class="errorMessage" data-bind="text: errorMessage"></div>
@@ -113,10 +155,10 @@
         </div>
     </div>
     <div class="content container">
-        <div class="cf results">
+        <div class="cf results" data-bind="visible: loadedTranslationsCount() > 0">
             <table>
                 <tbody data-bind="foreach: translationsToShow">
-                    <tr data-bind="css: { zebra: $index() % 2 > 0, 'error-row': errorMessageVisible, 'exportable-row': ($data.canBeExported() && $root.isAdvancedMode()) } ">
+                    <tr data-bind="css: { zebra: $index() % 2 > 0, 'error-row': errorMessageVisible, 'exportable-row': ($data.isOverridden() && $root.isAdvancedMode()) } ">
                         <td><div data-bind="text: key"></div></td>
                         <td><div data-bind="text: from"></div></td>
                         <td>
@@ -124,19 +166,18 @@
                             <textarea class="editeble" data-bind="value: to" rows="1" cols="10"></textarea>
                         </td>
                         <td>
-                            <div class="saved" data-bind="text: statusMessage, visible: statusMessageVisible"></div>
+                            <div class="saved" data-bind="text: message, visible: statusMessageVisible"></div>
                             <div class="error" data-bind="visible: errorMessageVisible">
                                 @Html.Translate("/resourceEditor/translations/common/error")
-                                <div class="error-hint" data-bind="text: errorMessage, visible: errorMessageVisible"></div>
+                                <div class="error-hint" data-bind="text: message, visible: errorMessageVisible"></div>
                             </div>
                         </td>
                     </tr>
                 </tbody>
             </table>
-        </div>
-
-        <div class="cf">
-            <button class="btn center" data-bind="click: loadMoreTranslations, visible: loadMoreButtonVisible">@Html.Translate("/resourceEditor/translations/loadMore")</button>
+            <div class="cf clear" data-bind="css: {loading: loadingTranslations}, visible: loadMoreButtonVisible">
+                <button id="uiBtnLoadMore" class="btn center" data-bind="click: loadMoreTranslations, visible: loadMoreButtonVisible">@Html.Translate("/resourceEditor/translations/loadMore")</button>
+            </div>
         </div>
     </div>
     <div class="spacer"></div>
@@ -154,6 +195,7 @@
                     <div class="box" data-bind="visible: keyFilterApplied">@Html.Translate("/resourceEditor/translations/clientFiltersApplied/key") - "<b data-bind="text: keyFilter"></b>"</div>
                     <div class="box" data-bind="visible: fromFilterApplied">@Html.Translate("/resourceEditor/translations/clientFiltersApplied/from") - "<b data-bind="text: fromFilter"></b>"</div>
                     <div class="box" data-bind="visible: toFilterApplied">@Html.Translate("/resourceEditor/translations/clientFiltersApplied/to") - "<b data-bind="text: toFilter"></b>"</div>
+                    <div class="box" data-bind="visible: defaultProviderKey() != resourceProviderKey()">@Html.Translate("/resourceEditor/translations/clientFiltersApplied/resourceProvider") - "<b data-bind="text: resourceProviderText"></b>"</div>
                 </div>
             </div>
             <div class="column2">

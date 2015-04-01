@@ -93,16 +93,12 @@ $(function() {
 
 
 	$('body').on('focusout', '.editeble', function() {
-		var editedText = $(this).val();
-		var replacedText = editedText.replace(/\r\n|\r|\n/g,'<br />');
 		var edit = $(this);
 		var text = $(this).prev();
 		
 		setTimeout(function() {
-			//text.removeClass('hide').html(replacedText);
 			text.removeClass('hide');
 			edit.removeClass('show');
-			
 		}, 
 		
 		100);	
@@ -118,24 +114,23 @@ $(function() {
 		
 		var actualText = textPrev.html();
 		var activeEdit = $(this);
-		var caret = activeEdit.caret()
+	    var caret = activeEdit.caret();
 		var content = activeEdit.val();
 
-		
 		if (e.ctrlKey && e.keyCode == 13) {
-			this.value = content.substring(0,caret)+"\n"+content.substring(caret,content.length);
+		    this.value = content.substring(0, caret) + "\n" + content.substring(caret, content.length);
 			return false;
 		}
 		
 		if(prevItem.length){
 			if (e.shiftKey && e.keyCode === 9) {
-				textPrev.click();
+			    textPrev.click();
 				return false;
 			}
 		}
 		else{
 			if (e.shiftKey && e.keyCode === 9) {
-				$(this).focusout();
+			    $(this).blur();
 				return false;
 			}
 		}
@@ -143,35 +138,37 @@ $(function() {
 		
 		if(nextItem.length){
 			if( e.keyCode === 13 || e.keyCode === 9) {
-				textNext.click();
+			    textNext.click();
 				return false;
 			}
 			
 		}
 		else{
-			if( e.keyCode === 13 || e.keyCode === 9) {
-				$(this).focusout();
+		    if (e.keyCode === 13 || e.keyCode === 9) {
+		        $(this).blur();
+
+		        var loadMoreButton = $('#uiBtnLoadMore');
+
+		        if (loadMoreButton) {
+		            loadMoreButton.focus();
+		        }
+
 				return false;
 			}
 			if (e.ctrlKey && e.keyCode == 13) {
-				this.value = content.substring(0,caret)+"\n"+content.substring(caret,content.length);
+			    this.value = content.substring(0, caret) + "\n" + content.substring(caret, content.length);
 				return false;
 			}
 		}
-		
+	    return true;
 	});
 	
 	$('body').on('focus', '.textContent', function(e) {
 		$(this).click();
 	});
-	
-	
-	/*$('body').on('click', '.simple-advanced span', function() {
-		$('.simple-advanced span').toggleClass('active');
-		$('.translation-block').toggleClass('advanced');
-	});*/
-	
-	
-	
-	
+
+    // Numeric only control handler
+    $(".numberOnly").bind('keypress', function(e) {
+        return (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) ? false : true;
+    });
 });

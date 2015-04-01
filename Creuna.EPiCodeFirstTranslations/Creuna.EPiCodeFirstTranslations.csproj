@@ -126,6 +126,7 @@
       <HintPath>..\packages\structuremap.2.6.4.1\lib\net40\StructureMap.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Caching" />
@@ -165,7 +166,6 @@
     <Compile Include="Attributes\TranslationPathAttribute.cs" />
     <Compile Include="CodeFirstLocalizationProvider.cs" />
     <Compile Include="ExpressionUtils.cs" />
-    <Compile Include="ITranslationContent.cs" />
     <Compile Include="ITranslationService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TranslationContentRenderer.cs" />
