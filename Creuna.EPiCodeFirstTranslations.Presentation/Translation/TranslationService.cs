@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Creuna.EPiCodeFirstTranslations.Presentation.Enums;
+﻿using Creuna.EPiCodeFirstTranslations.Presentation.Enums;
 using EPiServer.ServiceLocation;
 
 namespace Creuna.EPiCodeFirstTranslations.Presentation.Translation
@@ -8,13 +6,14 @@ namespace Creuna.EPiCodeFirstTranslations.Presentation.Translation
     [ServiceConfiguration(typeof(ITranslationService), Lifecycle = ServiceInstanceScope.Singleton)]
     public class TranslationService : TranslationServiceBase<Translations>
     {
-        public override IEnumerable<Type> GetTranslatableEnumTypes()
+        public TranslationService()
         {
-            return new Type[]
+            RegisterEnumsAsTranslatable(new[]
             {
-                typeof (Gender),
-                typeof(Position)
-            };
+                new EnumRegistration(typeof(Gender)),
+                new EnumRegistration(typeof(Enums2.Gender), "Gender 2"), 
+                new EnumRegistration(typeof(Position)),
+            });
         }
     }
 }

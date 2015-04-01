@@ -1,4 +1,5 @@
 ﻿@using Creuna.EPiCodeFirstTranslations.Presentation.Enums
+@using Enums2 = Creuna.EPiCodeFirstTranslations.Presentation.Enums2
 @model Creuna.EPiCodeFirstTranslations.Presentation.ViewModels.Pages.FrontPageViewModel
 
 @{
@@ -19,6 +20,10 @@
 <h4>Gender</h4>
 <p>Male is: "@Html.TranslationForEnumValue(Gender.Male)"</p>
 <p>Female is: "@Html.TranslationForEnumValue(Gender.Female)"</p>
+
+<h4>Gender from enums2</h4>
+<p>Male is: "@Html.TranslationForEnumValue(Enums2.Gender.Male)"</p>
+<p>Female is: "@Html.TranslationForEnumValue(Enums2.Gender.Female)"</p>
 
 <h4>Position</h4>
 <p>Top is: "@Html.TranslationForEnumValue(Position.Top)"</p>

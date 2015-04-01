@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using Creuna.EPiCodeFirstTranslations.Utils;
@@ -17,7 +16,7 @@ namespace Creuna.EPiCodeFirstTranslations
             if (translationContent == null) throw new ArgumentNullException("translationContent");
             if (string.IsNullOrEmpty(translationValueKey)) throw new ArgumentNullException("translationValueKey");
             if (basicCulture == null) throw new ArgumentNullException("basicCulture");
-            if (targetCulture == null)throw new ArgumentNullException("targetCulture");
+            if (targetCulture == null) throw new ArgumentNullException("targetCulture");
 
             if (!basicCulture.Equals(targetCulture))
             {

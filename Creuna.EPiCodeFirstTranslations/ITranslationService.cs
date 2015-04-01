@@ -15,7 +15,7 @@ namespace Creuna.EPiCodeFirstTranslations
 
         object GetTranslations(CultureInfo culture);
 
-        IEnumerable<Type> GetTranslatableEnumTypes();
+        IEnumerable<EnumRegistration> GetTranslatableEnumTypeRegistrations();
     }
 
     public interface ITranslationService<TTranslationContent> : ITranslationService

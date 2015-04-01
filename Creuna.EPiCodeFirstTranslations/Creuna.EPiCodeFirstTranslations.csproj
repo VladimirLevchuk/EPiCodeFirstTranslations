@@ -165,6 +165,7 @@
     <Compile Include="Attributes\TranslationKeyAttribute.cs" />
     <Compile Include="Attributes\TranslationPathAttribute.cs" />
     <Compile Include="CodeFirstLocalizationProvider.cs" />
+    <Compile Include="EnumRegistration.cs" />
     <Compile Include="ExpressionUtils.cs" />
     <Compile Include="ITranslationService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

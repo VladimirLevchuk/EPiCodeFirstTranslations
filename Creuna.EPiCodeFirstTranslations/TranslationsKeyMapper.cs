@@ -18,10 +18,10 @@ namespace Creuna.EPiCodeFirstTranslations
         private readonly Dictionary<Type, Dictionary<string, string>> _propertyPathToTranslationKeyMaps = new Dictionary<Type, Dictionary<string, string>>();
         private readonly Dictionary<Type, Dictionary<string, string>> _translationKeyToPropertyPathMaps = new Dictionary<Type, Dictionary<string, string>>();
 
-        public Dictionary<string, string> GetValueKeysMap(Type translationContentType, string translationKey)
+        public Dictionary<string, string> GetValueKeysMap(Type translationContentType, string translationKey, string translationContentAlias = null)
         {
             translationKey = PrepareTranslationKey(translationKey ?? string.Empty);
-            var keysMap = GetTranslationKeyToPropertyPathMap(translationContentType);
+            var keysMap = GetTranslationKeyToPropertyPathMap(translationContentType, translationContentAlias);
 
             if (string.IsNullOrEmpty(translationKey))
             {
@@ -32,18 +32,18 @@ namespace Creuna.EPiCodeFirstTranslations
             return keysMap;
         }
 
-        public string GetValueKey(Type translationContentType, string translationKey)
+        public string GetValueKey(Type translationContentType, string translationKey, string translationContentAlias = null)
         {
             translationKey = PrepareTranslationKey(translationKey);
-            var valueMap = GetTranslationKeyToPropertyPathMap(translationContentType);
+            var valueMap = GetTranslationKeyToPropertyPathMap(translationContentType, translationContentAlias);
             string propertyKey;
             valueMap.TryGetValue(translationKey, out propertyKey);
             return propertyKey;
         }
 
-        public string GetTranslationKey(Type translationContentType, string valueKey)
+        public string GetTranslationKey(Type translationContentType, string valueKey, string translationContentAlias = null)
         {
-            var keyMap = GetPropertyPathToTranslationKeyMap(translationContentType);
+            var keyMap = GetPropertyPathToTranslationKeyMap(translationContentType, translationContentAlias);
             string key;
             keyMap.TryGetValue(valueKey, out key);
             return key;
@@ -69,53 +69,59 @@ namespace Creuna.EPiCodeFirstTranslations
             return key;
         }
 
-        protected virtual Dictionary<string, string> GetTranslationKeyToPropertyPathMap(Type translationContentType)
+        protected virtual Dictionary<string, string> GetTranslationKeyToPropertyPathMap(Type translationContentType, string translationContentAlias)
         {
             Dictionary<string, string> map;
             while (!_translationKeyToPropertyPathMaps.TryGetValue(translationContentType, out map))
             {
-                BuildTranslationKeysMaps(translationContentType);
+                BuildTranslationKeysMaps(translationContentType, translationContentAlias);
             }
 
             return map;
         }
 
-        protected virtual Dictionary<string, string> GetPropertyPathToTranslationKeyMap(Type translationContentType)
+        protected virtual Dictionary<string, string> GetPropertyPathToTranslationKeyMap(Type translationContentType, string translationContentAlias)
         {
             Dictionary<string, string> map;
             while (!_propertyPathToTranslationKeyMaps.TryGetValue(translationContentType, out map))
             {
-                BuildTranslationKeysMaps(translationContentType);
+                BuildTranslationKeysMaps(translationContentType, translationContentAlias);
             }
 
             return map;
         }
 
-        protected virtual void BuildTranslationKeysMaps(Type contentType)
+        protected virtual void BuildTranslationKeysMaps(Type contentType, string contentAlias)
         {
             var translationKeyToPropertyPathMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             var propertyPathToTranslationKeyMap = new Dictionary<string, string>();
 
             if (contentType.IsEnum)
             {
-                FetchEnumTranslationKeys(translationKeyToPropertyPathMap, propertyPathToTranslationKeyMap, contentType);
+                FetchEnumTranslationKeys(translationKeyToPropertyPathMap, propertyPathToTranslationKeyMap, contentType, contentAlias);
             }
             else
             {
-                FetchContentTranslationKeys(translationKeyToPropertyPathMap, propertyPathToTranslationKeyMap, contentType, Enumerable.Empty<string>(), string.Empty);
+                List<String> rootTranslationPaths = new List<string>();
+                if (!string.IsNullOrEmpty(contentAlias))
+                {
+                    rootTranslationPaths.Add(contentAlias);
+                }
+
+                FetchContentTranslationKeys(translationKeyToPropertyPathMap, propertyPathToTranslationKeyMap, contentType, rootTranslationPaths, string.Empty);
             }
 
             _translationKeyToPropertyPathMaps.Add(contentType, translationKeyToPropertyPathMap);
             _propertyPathToTranslationKeyMaps.Add(contentType, propertyPathToTranslationKeyMap);
         }
 
-        protected virtual void FetchEnumTranslationKeys(Dictionary<string, string> translationKeyToPropertyPathMap, Dictionary<string, string> propertyPathToTranslationKeyMap, Type enumType)
+        protected virtual void FetchEnumTranslationKeys(Dictionary<string, string> translationKeyToPropertyPathMap, Dictionary<string, string> propertyPathToTranslationKeyMap, Type enumType, string enumTypeAlias)
         {
             var enumValues = Enum.GetValues(enumType);
             foreach (var enumValue in enumValues)
             {
                 string propertyPath = enumValue.ToString();
-                string translationKey = string.Format("/Enums/{0}/{1}/", enumType.Name, propertyPath);
+                string translationKey = string.Format("/Enums/{0}/{1}/", enumTypeAlias ?? enumType.Name, propertyPath);
                 translationKeyToPropertyPathMap.Add(translationKey, propertyPath);
                 propertyPathToTranslationKeyMap.Add(propertyPath, translationKey);
             }

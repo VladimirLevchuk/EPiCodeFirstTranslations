@@ -63,12 +63,12 @@ namespace Creuna.EPiCodeFirstTranslations
                 }
             }
 
-            foreach (var translatableEnumType in TranslationService.GetTranslatableEnumTypes())
+            foreach (var enumRegistration in TranslationService.GetTranslatableEnumTypeRegistrations())
             {
-                var enumTranslationKeysMap = TranslationsKeyMapper.GetValueKeysMap(translatableEnumType, translationKey);
+                var enumTranslationKeysMap = TranslationsKeyMapper.GetValueKeysMap(enumRegistration.EnumType, translationKey, enumRegistration.Alias);
                 foreach (string key in enumTranslationKeysMap.Keys)
                 {
-                    string value = TranslationReader.GetEnumTranslation(translatableEnumType, enumTranslationKeysMap[key], basicCulture, culture);
+                    string value = TranslationReader.GetEnumTranslation(enumRegistration.EnumType, enumTranslationKeysMap[key], basicCulture, culture);
                     if (value != null)
                     {
                         values.Add(key, value);
@@ -93,12 +93,12 @@ namespace Creuna.EPiCodeFirstTranslations
                 }
             }
 
-            foreach (var translatableEnumType in TranslationService.GetTranslatableEnumTypes())
+            foreach (var enumRegistation in TranslationService.GetTranslatableEnumTypeRegistrations())
             {
-                valueKey = TranslationsKeyMapper.GetValueKey(translatableEnumType, translationKey);
+                valueKey = TranslationsKeyMapper.GetValueKey(enumRegistation.EnumType, translationKey, enumRegistation.Alias);
                 if (!string.IsNullOrEmpty(valueKey))
                 {
-                    return TranslationReader.GetEnumTranslation(translatableEnumType, valueKey, basicCulture, culture);
+                    return TranslationReader.GetEnumTranslation(enumRegistation.EnumType, valueKey, basicCulture, culture);
                 }
             }
 
