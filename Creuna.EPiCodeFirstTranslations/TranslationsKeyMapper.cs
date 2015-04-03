@@ -117,13 +117,16 @@ namespace Creuna.EPiCodeFirstTranslations
 
         protected virtual void FetchEnumTranslationKeys(Dictionary<string, string> translationKeyToPropertyPathMap, Dictionary<string, string> propertyPathToTranslationKeyMap, Type enumType, string enumTypeAlias)
         {
-            var enumValues = Enum.GetValues(enumType);
-            foreach (var enumValue in enumValues)
+            var enumFields = enumType.GetFields();
+            foreach (var enumField in enumFields)
             {
-                string propertyPath = enumValue.ToString();
-                string translationKey = string.Format("/Enums/{0}/{1}/", enumTypeAlias ?? enumType.Name, propertyPath);
-                translationKeyToPropertyPathMap.Add(translationKey, propertyPath);
-                propertyPathToTranslationKeyMap.Add(propertyPath, translationKey);
+                if (!enumField.IsSpecialName)
+                {
+                    string propertyPath = enumField.Name;
+                    string translationKey = string.Format("/Enums/{0}/{1}/", enumTypeAlias ?? enumType.Name, propertyPath);
+                    translationKeyToPropertyPathMap.Add(translationKey, propertyPath);
+                    propertyPathToTranslationKeyMap.Add(propertyPath, translationKey);
+                }
             }
         }
 

@@ -13,6 +13,7 @@ namespace Creuna.EPiCodeFirstTranslations.Presentation.Translation
                 new EnumRegistration(typeof(Gender)),
                 new EnumRegistration(typeof(Enums2.Gender), "Gender 2"), 
                 new EnumRegistration(typeof(Position)),
+                new EnumRegistration(typeof(Season)), 
             });
         }
     }
