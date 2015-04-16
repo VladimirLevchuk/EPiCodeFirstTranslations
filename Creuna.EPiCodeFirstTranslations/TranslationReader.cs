@@ -1,6 +1,9 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using System.Linq;
+using System.Reflection;
+using Creuna.EPiCodeFirstTranslations.Attributes;
 using Creuna.EPiCodeFirstTranslations.Utils;
 
 namespace Creuna.EPiCodeFirstTranslations
@@ -18,13 +21,8 @@ namespace Creuna.EPiCodeFirstTranslations
             if (basicCulture == null) throw new ArgumentNullException("basicCulture");
             if (targetCulture == null) throw new ArgumentNullException("targetCulture");
 
-            if (!basicCulture.Equals(targetCulture))
-            {
-                return null;
-            }
-
-            string cacheKey = string.Format("contentHachCode:{0} key:{1}", translationContent.GetHashCode(), translationValueKey);
-            var translation = _cache.GetOrLoad(cacheKey, () => ReadTranslation(translationContent, translationValueKey) ?? NullValue);
+            string cacheKey = string.Format("contentHachCode:{0} key:{1} culture{2}", translationContent.GetHashCode(), translationValueKey, targetCulture.Name);
+            var translation = _cache.GetOrLoad(cacheKey, () => ReadTranslation(translationContent, translationValueKey, basicCulture, targetCulture) ?? NullValue);
 
             return translation == NullValue ? null : translation;
         }
@@ -36,46 +34,86 @@ namespace Creuna.EPiCodeFirstTranslations
             if (basicCulture == null) throw new ArgumentNullException("basicCulture");
             if (targetCulture == null) throw new ArgumentNullException("targetCulture");
 
-            if (!basicCulture.Equals(targetCulture))
-            {
-                return null;
-            }
 
-            string cacheKey = string.Format("enumType:{0} key:{1}", enumType.FullName, translationValueKey);
-            var translation = _cache.GetOrLoad(cacheKey, () => ReadEnumTranslation(enumType, translationValueKey) ?? NullValue);
+            string cacheKey = string.Format("enumType:{0} key:{1} culture{2}", enumType.FullName, translationValueKey, targetCulture.Name);
+            var translation = _cache.GetOrLoad(cacheKey, () => ReadEnumTranslation(enumType, translationValueKey, basicCulture, targetCulture) ?? NullValue);
 
             return translation == NullValue ? null : translation;
         }
 
-        protected virtual string ReadTranslation(object instance, string translationKey)
+        protected virtual string ReadTranslation(object instance, string translationKey, CultureInfo basicCulture, CultureInfo targetCulture)
         {
             string[] propertyNames = translationKey.Split('.');
+            var translationObject = instance;
+            PropertyInfo translationProperty = null;
+            int propertyNameIndex = 0;
 
-            foreach (var propertyName in propertyNames)
+            do
             {
-                if (instance == null)
+                var propertyName = propertyNames[propertyNameIndex];
+                translationProperty = translationObject.GetType().GetProperty(propertyName);
+
+                if (propertyNameIndex == propertyNames.Length - 1)
                 {
-                    return null;
+                    break;
                 }
 
-                var property = instance.GetType().GetProperty(propertyName);
-                instance = property.GetValue(instance, null);
+                translationObject = translationProperty.GetValue(translationObject, null);
+
+                propertyNameIndex++;
+            } while (translationObject != null);
+
+
+            if (translationObject == null)
+            {
+                return null;
             }
 
-            return (string)instance;
+            string translation = null;
+            if (basicCulture.Equals(targetCulture))
+            {
+                translation = (string)translationProperty.GetValue(translationObject, null);
+            }
+            else
+            {
+                translation = GetCustomCultureTranslation(translationProperty, targetCulture);
+            }
+
+            return translation;
         }
 
-        protected virtual string ReadEnumTranslation(Type enumType, string valueKey)
+        string ReadEnumTranslation(Type enumType, string valueKey, CultureInfo basicCulture, CultureInfo targetCulture)
         {
             var valueField = enumType.GetField(valueKey);
 
-            var displayAttr = (DisplayAttribute)Attribute.GetCustomAttribute(valueField, typeof(DisplayAttribute));
-            if (displayAttr != null)
+            if (basicCulture.Equals(targetCulture))
             {
-                return displayAttr.Name;
+                var displayAttr = (DisplayAttribute) Attribute.GetCustomAttribute(valueField, typeof (DisplayAttribute));
+                if (displayAttr != null)
+                {
+                    return displayAttr.Name;
+                }
+            }
+            else
+            {
+                return GetCustomCultureTranslation(valueField, targetCulture);
             }
 
             return valueField.GetValue(null).ToString();
+        }
+
+        private string GetCustomCultureTranslation(MemberInfo memberInfo, CultureInfo targetCulture)
+        {
+            var translationAttr = Attribute.GetCustomAttributes(memberInfo, typeof(TranslationForCultureAttribute))
+                   .Cast<TranslationForCultureAttribute>()
+                   .FirstOrDefault(a => a.Culture.Equals(targetCulture));
+
+            if (translationAttr != null)
+            {
+                return translationAttr.Translation;
+            }
+
+            return null;
         }
     }
 }

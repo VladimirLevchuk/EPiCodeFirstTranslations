@@ -7,6 +7,7 @@ namespace Creuna.EPiCodeFirstTranslations.Presentation.Translation
     {
         public string Hello { get { return "Hello everybody!"; } }
 
+        [TranslationForCulture("sv", "Bye for SV from CF")]
         [TranslationKey("Goodbye")] // additional key.
         public string Bye { get { return "Bye"; } }
     }

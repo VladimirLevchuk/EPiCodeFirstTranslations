@@ -7,8 +7,8 @@
 }
 
 <h2>@Model.Header</h2>
-<p>Hello text is "@Html.Translation(t =>t.Texts.Hello)"</p>
-<p>Bye test is "@Html.Translation(t =>t.Texts.Bye)"</p>
+<p>Hello text is "@Html.Translation(t => t.Texts.Hello)"</p>
+<p>Bye test is "@Html.Translation(t => t.Texts.Bye)"</p>
 
 <p>Ok label is " @Html.Translation(t => t.Labels.Ok)"</p>
 <p>Save label is "@Html.Translation(t => t.Labels.Save)"</p>
@@ -30,3 +30,13 @@
 <p>Bottom is: "@Html.TranslationForEnumValue(Position.Bottom)"</p>
 <p>TopLeft is: "@Html.TranslationForEnumValue(Position.TopLeft)"</p>
 <p>TopRight is: "@Html.TranslationForEnumValue(Position.TopRight)"</p>
+
+<h4>Season</h4>
+<p>None is: "@Html.TranslationForEnumValue(Season.None)"</p>
+<p>Spring is: "@Html.TranslationForEnumValue(Season.Spring)"</p>
+<p>All ywar contains Spring: @Season.AllYear.HasFlag(Season.Spring)</p>
+
+<p>Summer is: "@Html.TranslationForEnumValue(Season.Summer)"</p>
+<p>Autumn is: "@Html.TranslationForEnumValue(Season.Autumn)"</p>
+<p>Winter is: "@Html.TranslationForEnumValue(Season.Winter)"</p>
+<p>AllYear is: "@Html.TranslationForEnumValue(Season.AllYear)"</p>

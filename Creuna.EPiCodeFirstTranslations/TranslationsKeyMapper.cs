@@ -61,9 +61,9 @@ namespace Creuna.EPiCodeFirstTranslations
                 key = KeyPartsSeparator + key;
             }
 
-            if (!key.EndsWith(KeyPartsSeparator))
+            if (key.EndsWith(KeyPartsSeparator))
             {
-                key = key + KeyPartsSeparator;
+                key = key.Substring(key.Length - KeyPartsSeparator.Length);
             }
 
             return key;
@@ -123,7 +123,7 @@ namespace Creuna.EPiCodeFirstTranslations
                 if (!enumField.IsSpecialName)
                 {
                     string propertyPath = enumField.Name;
-                    string translationKey = string.Format("/Enums/{0}/{1}/", enumTypeAlias ?? enumType.Name, propertyPath);
+                    string translationKey = string.Format("/Enums/{0}/{1}", enumTypeAlias ?? enumType.Name, propertyPath);
                     translationKeyToPropertyPathMap.Add(translationKey, propertyPath);
                     propertyPathToTranslationKeyMap.Add(propertyPath, translationKey);
                 }

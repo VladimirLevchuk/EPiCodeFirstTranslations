@@ -40,22 +40,23 @@ namespace Creuna.EPiCodeFirstTranslations.Presentation.Enums
     [Flags]
     public enum Season
     {
-        [Display(Name = "None")]
+        [TranslationForCulture("sv", "None for SV from CF")]
+        [Display(Name = "None Display Name")]
         None = 0,
 
         [Display(Name = "Winter")]
-        Winter = 1,
+        Winter = 1 << 0,
 
-        [Display(Name = "Spring")]
-        Spring = 2,
+        [Display(Name = "Spring default translation")]
+        Spring = 1 << 1,
 
         [Display(Name = "Summer")]
-        Summer = 4,
+        Summer = 1 << 2,
 
         [Display(Name = "Autumn")]
-        Autumn = 8,
+        Autumn = 1 << 3,
 
         [Display(Name = "All year")]
-        AllYear = Winter & Spring & Summer & Autumn
+        AllYear = Winter | Spring | Summer | Autumn
     }
 }
