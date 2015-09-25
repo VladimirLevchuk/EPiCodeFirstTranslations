@@ -103,7 +103,7 @@ namespace Creuna.EPiCodeFirstTranslations
             return _translatableEnumRegistrations.Values;
         }
 
-        public void RegisterEnumsAsTranslatable(IEnumerable<EnumRegistration> registrations)
+        public virtual void RegisterEnumsAsTranslatable(IEnumerable<EnumRegistration> registrations)
         {
             // TODO: update for using following notation:
             /*registry.Add<Gender>();
@@ -134,7 +134,7 @@ namespace Creuna.EPiCodeFirstTranslations
             _translatableEnumRegistrations.Add(registration.EnumType, registration);
         }
 
-        protected virtual string GetTranslationKey(Expression<Func<TTranslationContent, string>> translationPath)
+        public virtual string GetTranslationKey(Expression<Func<TTranslationContent, string>> translationPath)
         {
             return TranslationsKeyMapper.GetTranslationKey(typeof(TTranslationContent), ExpressionUtils.GetPropertyPath(translationPath));
         }
