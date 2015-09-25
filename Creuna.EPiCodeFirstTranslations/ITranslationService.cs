@@ -25,5 +25,9 @@ namespace Creuna.EPiCodeFirstTranslations
         string Translate(Expression<Func<TTranslationContent, string>> translationPathExpression, string fallback);
 
         string TranslateEnumValue(Enum value);
+
+        string GetTranslationKey(Expression<Func<TTranslationContent, string>> translationPath);
+
+        string GetEnumTranslationKey(Enum item);
     }
 }
