@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using EPiServer.Framework.Localization;
 using EPiServer.ServiceLocation;
 
@@ -11,9 +9,9 @@ namespace Creuna.EPiCodeFirstTranslations
 {
     public class CodeFirstLocalizationProvider : LocalizationProvider
     {
-        private readonly Lazy<TranslationProvider> _translationResolver = new Lazy<TranslationProvider>(ServiceLocator.Current.GetInstance<TranslationProvider>);
+        private readonly Lazy<ITranslationProvider> _translationResolver = new Lazy<ITranslationProvider>(ServiceLocator.Current.GetInstance<ITranslationProvider>);
 
-        protected virtual TranslationProvider TranslationProvider { get { return _translationResolver.Value; } }
+        protected virtual ITranslationProvider TranslationProvider { get { return _translationResolver.Value; } }
 
         public override string GetString(string originalKey, string[] normalizedKey, CultureInfo culture)
         {

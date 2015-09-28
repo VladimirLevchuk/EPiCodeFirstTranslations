@@ -1,10 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using Creuna.EPiCodeFirstTranslations.KeyBuilder;
 
 namespace Creuna.EPiCodeFirstTranslations
 {
-    public class TranslationProvider
+    public interface ITranslationProvider
+    {
+        Dictionary<string, string> GetTranslationValues(string translationKey, CultureInfo culture);
+        string GetTranslationValue(string translationKey, CultureInfo culture);
+        IEnumerable<CultureInfo> GetSupportedLanguages();
+    }
+
+    public class TranslationProvider : ITranslationProvider
     {
         public TranslationProvider(ITranslationService translationService, TranslationsKeyMapper translationsKeyMapper, TranslationReader translationReader)
         {
@@ -45,7 +53,7 @@ namespace Creuna.EPiCodeFirstTranslations
 
             var basicCulture = TranslationService.GetBasicCulture();
             var translationContentType = TranslationService.GetTranslationContentType();
-            var translationKeysMap = TranslationsKeyMapper.GetValueKeysMap(translationContentType, translationKey);
+            var translationKeysMap = TranslationsKeyMapper.QueryTranslationKeyToPropertyPathMap(translationContentType, translationKey);
 
             if (translationKeysMap.Count > 0)
             {
@@ -65,7 +73,7 @@ namespace Creuna.EPiCodeFirstTranslations
 
             foreach (var enumRegistration in TranslationService.GetTranslatableEnumTypeRegistrations())
             {
-                var enumTranslationKeysMap = TranslationsKeyMapper.GetValueKeysMap(enumRegistration.EnumType, translationKey, enumRegistration.Alias);
+                var enumTranslationKeysMap = TranslationsKeyMapper.QueryTranslationKeyToPropertyPathMap(enumRegistration.EnumType, translationKey, enumRegistration.Alias);
                 foreach (string key in enumTranslationKeysMap.Keys)
                 {
                     string value = TranslationReader.GetEnumTranslation(enumRegistration.EnumType, enumTranslationKeysMap[key], basicCulture, culture);
@@ -83,7 +91,7 @@ namespace Creuna.EPiCodeFirstTranslations
         {
             var basicCulture = TranslationService.GetBasicCulture();
             var translationContentType = TranslationService.GetTranslationContentType();
-            var valueKey = TranslationsKeyMapper.GetValueKey(translationContentType, translationKey);
+            var valueKey = TranslationsKeyMapper.GetPropertyPathOrEnumValueKey(translationContentType, translationKey);
             if (!string.IsNullOrEmpty(valueKey))
             {
                 var translationContent = TranslationService.GetTranslations(culture);
@@ -95,7 +103,7 @@ namespace Creuna.EPiCodeFirstTranslations
 
             foreach (var enumRegistation in TranslationService.GetTranslatableEnumTypeRegistrations())
             {
-                valueKey = TranslationsKeyMapper.GetValueKey(enumRegistation.EnumType, translationKey, enumRegistation.Alias);
+                valueKey = TranslationsKeyMapper.GetPropertyPathOrEnumValueKey(enumRegistation.EnumType, translationKey, enumRegistation.Alias);
                 if (!string.IsNullOrEmpty(valueKey))
                 {
                     return TranslationReader.GetEnumTranslation(enumRegistation.EnumType, valueKey, basicCulture, culture);

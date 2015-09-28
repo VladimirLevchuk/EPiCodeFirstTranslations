@@ -41,6 +41,10 @@
       <Private>True</Private>
       <HintPath>..\packages\Castle.Windsor.3.2.0\lib\net40\Castle.Windsor.dll</HintPath>
     </Reference>
+    <Reference Include="Creuna.EPiCodeFirstTranslations.KeyBuilder, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Creuna.EPiCodeFirstTranslations.KeyBuilder.2.0.0\lib\net40\Creuna.EPiCodeFirstTranslations.KeyBuilder.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="EPiServer, Version=7.6.3.0, Culture=neutral, PublicKeyToken=8fe83dea738b45b7, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\EPiServer.CMS.Core.7.6.3\lib\net40\EPiServer.dll</HintPath>
@@ -162,19 +166,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Attributes\TranslationForCultureAttribute.cs" />
-    <Compile Include="Attributes\TranslationKeyAttribute.cs" />
-    <Compile Include="Attributes\TranslationPathAttribute.cs" />
     <Compile Include="CodeFirstLocalizationProvider.cs" />
-    <Compile Include="EnumRegistration.cs" />
-    <Compile Include="ExpressionUtils.cs" />
+    <Compile Include="EPiCodeFirstTranslationsRegistry.cs" />
     <Compile Include="ITranslationService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TranslationContentRenderer.cs" />
+    <Compile Include="LegacyAnnotationAttributes.cs" />
+    <Compile Include="TranslationForCultureAttribute.cs" />
     <Compile Include="TranslationProvider.cs" />
     <Compile Include="TranslationReader.cs" />
     <Compile Include="TranslationServiceBase.cs" />
-    <Compile Include="TranslationsKeyMapper.cs" />
     <Compile Include="Utils\SimpleMamoryCache.cs" />
     <Content Include="Translation\HtmlHelperExtentions.cs.pp" />
     <Content Include="Translation\Translations.cs.pp" />

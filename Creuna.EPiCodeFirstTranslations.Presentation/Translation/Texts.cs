@@ -2,13 +2,13 @@
 
 namespace Creuna.EPiCodeFirstTranslations.Presentation.Translation
 {
-    [TranslationPath("General")]
+    [KeyBuilder.Annotation.TranslationPath("General")]
     public class Texts
     {
         public string Hello { get { return "Hello everybody!"; } }
 
         [TranslationForCulture("sv", "Bye for SV from CF")]
-        [TranslationKey("Goodbye")] // additional key.
+        [KeyBuilder.Annotation.AlsoTranslationForKey("Goodbye")] // additional key.
         public string Bye { get { return "Bye"; } }
     }
 }
