@@ -15,4 +15,7 @@
     <copyright>Copyright 2014</copyright>
     <tags>EPiServer Localization Translation Resources</tags>
   </metadata>
+  <files>
+	<file src="readme.txt" target="" />
+  </files>
 </package>

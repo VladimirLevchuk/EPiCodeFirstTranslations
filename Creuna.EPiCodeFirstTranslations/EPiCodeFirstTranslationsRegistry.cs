@@ -21,4 +21,15 @@ namespace Creuna.EPiCodeFirstTranslations
             For<ITranslationKeyBuilder<TTranslationContent>>().Use<TranslationKeyBuilder<TTranslationContent>>();
         }
     }
+
+    public class EPiCodeFirstTranslationServiceRegistry<TTranslationService, TTranslations> : Registry
+        where TTranslationService: TranslationServiceBase<TTranslations>
+    {
+        public EPiCodeFirstTranslationServiceRegistry()
+        {
+            For<TTranslationService>().Singleton().Use<TTranslationService>();
+            For<ITranslationService>().Singleton().Use(ctx => ctx.GetInstance<TTranslationService>());
+            For<ITranslationService<TTranslations>>().Singleton().Use(ctx => ctx.GetInstance<TTranslationService>());
+        }
+    }
 }
