@@ -11,3 +11,4 @@ Creuna.EPiCodeFirstTranslations.KeyBuilder/obj/
 Creuna.EPiCodeFirstTranslations.KeyBuilder.Tests/obj/
 *.log
 *.user
+*.nupkg
