@@ -1,9 +1,9 @@
 ﻿using System;
 
-namespace Creuna.EPiCodeFirstTranslations.Attributes
+namespace Creuna.EPiCodeFirstTranslations.KeyBuilder.Annotation
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
-    public sealed class TranslationPathAttribute : Attribute
+    public class TranslationPathAttribute : Attribute
     {
         public TranslationPathAttribute(string path)
         {

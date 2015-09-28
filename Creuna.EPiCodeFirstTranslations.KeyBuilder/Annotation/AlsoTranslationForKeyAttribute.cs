@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace Creuna.EPiCodeFirstTranslations.Attributes
+namespace Creuna.EPiCodeFirstTranslations.KeyBuilder.Annotation
 {
     [AttributeUsage(AttributeTargets.Property, Inherited = false, AllowMultiple = true)]
-    public sealed class TranslationKeyAttribute : Attribute
+    public class AlsoTranslationForKeyAttribute : Attribute
     {
-        public TranslationKeyAttribute(string key)
+        public AlsoTranslationForKeyAttribute(string key)
         {
             Key = key;
         }

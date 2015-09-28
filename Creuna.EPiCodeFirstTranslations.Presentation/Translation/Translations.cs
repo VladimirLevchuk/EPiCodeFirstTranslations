@@ -1,4 +1,4 @@
-﻿using Creuna.EPiCodeFirstTranslations.Attributes;
+﻿using Creuna.EPiCodeFirstTranslations.KeyBuilder.Annotation;
 
 namespace Creuna.EPiCodeFirstTranslations.Presentation.Translation
 {

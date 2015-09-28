@@ -167,6 +167,8 @@
     <Compile Include="ITranslationService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TranslationContentRenderer.cs" />
+    <Compile Include="LegacyAnnotationAttributes.cs" />
+    <Compile Include="TranslationForCultureAttribute.cs" />
     <Compile Include="TranslationProvider.cs" />
     <Compile Include="TranslationReader.cs" />
     <Compile Include="TranslationServiceBase.cs" />

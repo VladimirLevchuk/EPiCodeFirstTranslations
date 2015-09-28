@@ -1,4 +1,4 @@
-﻿using Creuna.EPiCodeFirstTranslations.Attributes;
+﻿using Creuna.EPiCodeFirstTranslations.KeyBuilder.Annotation;
 
 namespace Creuna.EPiCodeFirstTranslations.KeyBuilder.Tests
 {
@@ -7,6 +7,7 @@ namespace Creuna.EPiCodeFirstTranslations.KeyBuilder.Tests
     {
         public Translations()
         {
+            Messages = new Messages();
             Errors = new Errors();
             Labels = new Labels();
             Texts = new Texts();
@@ -16,6 +17,7 @@ namespace Creuna.EPiCodeFirstTranslations.KeyBuilder.Tests
 
         public Labels Labels { get; private set; }
         public Errors Errors { get; private set; }
+        public Messages Messages { get; private set; }
         
         public string Text1 { get { return "Text1"; } }
         public string Text2 { get { return "Text2"; } }
@@ -53,10 +55,10 @@ namespace Creuna.EPiCodeFirstTranslations.KeyBuilder.Tests
     [TranslationPath("~/my-texts")]
     public class Texts
     {
-        public string Text1 { get; set; }
+        public string Text1 { get { return "Text1"; } }
 
-        [TranslationKey("/custom-key/text-2")]
-        public string Text2 { get; set; }
+        [AlsoTranslationForKey("/custom-key/text-2")]
+        public string Text2 { get { return "Text2"; }}
     }
 
     [TranslationPath("my-errors")]
@@ -66,7 +68,30 @@ namespace Creuna.EPiCodeFirstTranslations.KeyBuilder.Tests
 
         public string Error2 { get { return "Error2"; } }
 
-        [TranslationKey("/custom-key/error-3")]
+        [AlsoTranslationForKey("/custom-key/error-3")]
         public string Error3 { get { return "Error3"; } }
+    }
+
+    public class InheritedTranslationPathAttribute : TranslationPathAttribute
+    {
+        public InheritedTranslationPathAttribute(string path) : base(path)
+        {
+        }
+    }
+
+    public class InheritedAlsoTranslationForKeyAttribute : AlsoTranslationForKeyAttribute
+    {
+        public InheritedAlsoTranslationForKeyAttribute(string key) : base(key)
+        {
+        }
+    }
+
+    [InheritedTranslationPath("~/my-messages")]
+    public class Messages
+    {
+        public string Message1 { get { return "Message1"; } }
+
+        [InheritedAlsoTranslationForKey("/inherited-key/text-2")]
+        public string Message2 { get { return "Message2"; }}
     }
 }

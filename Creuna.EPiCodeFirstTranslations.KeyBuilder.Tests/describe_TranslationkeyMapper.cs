@@ -36,6 +36,12 @@ namespace Creuna.EPiCodeFirstTranslations.KeyBuilder.Tests
                 var map = _mapper.QueryTranslationKeyToPropertyPathMap(typeof(MyEnumWithAlias), string.Empty, "MyEnumAlias");
                 map.Keys.Should().BeEquivalentTo("/Enums/MyEnumAlias/EnumValue1", "/Enums/MyEnumAlias/EnumValue2");
             };
+
+            it["InheritedAlsoTranslationForKeyAttribute works as AlsoTranslationForKeyAttribute"] = () =>
+            {
+                var map = _mapper.QueryTranslationKeyToPropertyPathMap(typeof(Translations), "/my-messages");
+                map.Keys.Should().BeEquivalentTo("/my-messages/Message1", "/my-messages/Message2", "/my-messages/inherited-key/text-2");
+            };
         }
     }
 }

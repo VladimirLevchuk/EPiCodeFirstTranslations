@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using Creuna.EPiCodeFirstTranslations.Attributes;
+using Creuna.EPiCodeFirstTranslations.KeyBuilder.Annotation;
 
 namespace Creuna.EPiCodeFirstTranslations.KeyBuilder
 {
@@ -128,8 +128,17 @@ namespace Creuna.EPiCodeFirstTranslations.KeyBuilder
             }
         }
 
-        protected virtual void FetchContentTranslationKeys(Dictionary<string, string> translationKeyToPropertyPathMap, Dictionary<string, string> propertyPathToTranslationKeyMap, Type contentType, IEnumerable<string> parentTranslationPaths, string contentTypePath)
+        protected virtual void FetchContentTranslationKeys(Dictionary<string, string> translationKeyToPropertyPathMap, 
+            Dictionary<string, string> propertyPathToTranslationKeyMap, 
+            Type contentType, 
+            IEnumerable<string> parentTranslationPaths, 
+            string contentTypePath)
         {
+            if (contentType.IsPrimitive || contentType == typeof (string))
+            {
+                return;
+            }
+
             var localContentTranslationPaths = GetTranslationPaths(contentType);
             var currentContentTranslationPaths = BuildKeyPaths(parentTranslationPaths, localContentTranslationPaths).ToList();
 
@@ -154,7 +163,9 @@ namespace Creuna.EPiCodeFirstTranslations.KeyBuilder
             var childContentTypeProps = GetChildTranslationContentTypeProperties(contentType);
             foreach (var childContentTypeProp in childContentTypeProps)
             {
-                FetchContentTranslationKeys(translationKeyToPropertyPathMap, propertyPathToTranslationKeyMap, childContentTypeProp.PropertyType, currentContentTranslationPaths, CombineTypePropertyPath(contentTypePath, childContentTypeProp.Name));
+                FetchContentTranslationKeys(translationKeyToPropertyPathMap, propertyPathToTranslationKeyMap, 
+                    childContentTypeProp.PropertyType, currentContentTranslationPaths, 
+                    CombineTypePropertyPath(contentTypePath, childContentTypeProp.Name));
             }
         }
 
@@ -233,7 +244,7 @@ namespace Creuna.EPiCodeFirstTranslations.KeyBuilder
             var keys = new HashSet<string>();
             var defaultKey = propertyInfo.Name;
             keys.Add(defaultKey);
-            var keyAttrs = propertyInfo.GetCustomAttributes(typeof(TranslationKeyAttribute), false).Cast<TranslationKeyAttribute>();
+            var keyAttrs = propertyInfo.GetCustomAttributes(typeof(AlsoTranslationForKeyAttribute), false).Cast<AlsoTranslationForKeyAttribute>();
             foreach (var keyAttr in keyAttrs)
             {
                 keys.Add(keyAttr.Key);

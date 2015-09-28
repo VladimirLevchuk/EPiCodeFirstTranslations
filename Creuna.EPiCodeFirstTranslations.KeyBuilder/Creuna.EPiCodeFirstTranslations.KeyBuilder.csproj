@@ -40,8 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Annotation\TranslationForCultureAttribute.cs" />
-    <Compile Include="Annotation\TranslationKeyAttribute.cs" />
+    <Compile Include="Annotation\AlsoTranslationForKeyAttribute.cs" />
     <Compile Include="Annotation\TranslationPathAttribute.cs" />
     <Compile Include="EnumRegistration.cs" />
     <Compile Include="EnumRegistry.cs" />

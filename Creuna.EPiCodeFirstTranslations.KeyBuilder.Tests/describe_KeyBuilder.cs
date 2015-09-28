@@ -1,5 +1,4 @@
-﻿using Creuna.EPiCodeFirstTranslations.Attributes;
-using FluentAssertions;
+﻿using FluentAssertions;
 
 namespace Creuna.EPiCodeFirstTranslations.KeyBuilder.Tests
 {
@@ -22,6 +21,24 @@ namespace Creuna.EPiCodeFirstTranslations.KeyBuilder.Tests
             it["it builds a path to nested property"] = () => translationsKeyBuilder.GetTranslationKey(x => x.Labels.Label1).Should().Be("/Labels/Label1");
             it["it allows to override path at some point using TranslationPath attribute"] = () => translationsKeyBuilder.GetTranslationKey(x => x.Errors.Error1).Should().Be("/my-errors/Error1");
             it["it allows to override path using absolute path (prefixed with ~) with TranslationPath attribute"] = () => translationsKeyBuilder.GetTranslationKey(x => x.Texts.Text1).Should().Be("/my-texts/Text1");
+        }
+
+        void when_inherited_attributes_used()
+        {
+            TranslationKeyBuilder<Translations> translationsKeyBuilder = null;
+            TranslationKeyBuilder<Messages> messagesKeyBuilder = null;
+
+            before = () =>
+            {
+                translationsKeyBuilder = new TranslationKeyBuilder<Translations>(_mapper);
+                messagesKeyBuilder = new TranslationKeyBuilder<Messages>(_mapper);
+            };
+
+            it["InheritedTranslationPath works as TranslationPath"] = () =>
+            {
+                translationsKeyBuilder.GetTranslationKey(x => x.Messages.Message1).Should().Be("/my-messages/Message1");
+                messagesKeyBuilder.GetTranslationKey(x => x.Message1).Should().Be("/my-messages/Message1");
+            };
         }
 
         void when_asking_for_keys_for_a_nested_translation_class()
