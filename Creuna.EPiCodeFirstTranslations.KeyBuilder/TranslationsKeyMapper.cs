@@ -4,12 +4,10 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using Creuna.EPiCodeFirstTranslations.Attributes;
-using EPiServer.ServiceLocation;
 
-namespace Creuna.EPiCodeFirstTranslations
+namespace Creuna.EPiCodeFirstTranslations.KeyBuilder
 {
-    [ServiceConfiguration(typeof(TranslationsKeyMapper), Lifecycle = ServiceInstanceScope.Singleton)]
-    public class TranslationsKeyMapper
+    public class TranslationsKeyMapper : ITranslationsKeyMapper
     {
         private const string RootedKeyStart = "~/";
         private const string KeyPartsSeparator = "/";
@@ -18,7 +16,7 @@ namespace Creuna.EPiCodeFirstTranslations
         private readonly Dictionary<Type, Dictionary<string, string>> _propertyPathToTranslationKeyMaps = new Dictionary<Type, Dictionary<string, string>>();
         private readonly Dictionary<Type, Dictionary<string, string>> _translationKeyToPropertyPathMaps = new Dictionary<Type, Dictionary<string, string>>();
 
-        public Dictionary<string, string> GetValueKeysMap(Type translationContentType, string translationKey, string translationContentAlias = null)
+        public virtual Dictionary<string, string> QueryTranslationKeyToPropertyPathMap(Type translationContentType, string translationKey, string translationContentAlias = null)
         {
             translationKey = PrepareTranslationKey(translationKey ?? string.Empty);
             var keysMap = GetTranslationKeyToPropertyPathMap(translationContentType, translationContentAlias);
@@ -32,7 +30,7 @@ namespace Creuna.EPiCodeFirstTranslations
             return keysMap;
         }
 
-        public string GetValueKey(Type translationContentType, string translationKey, string translationContentAlias = null)
+        public virtual string GetPropertyPathOrEnumValueKey(Type translationContentType, string translationKey, string translationContentAlias = null)
         {
             translationKey = PrepareTranslationKey(translationKey);
             var valueMap = GetTranslationKeyToPropertyPathMap(translationContentType, translationContentAlias);

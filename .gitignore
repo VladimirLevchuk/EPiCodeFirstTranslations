@@ -5,3 +5,9 @@ Creuna.EPiCodeFirstTranslations/bin/
 Creuna.EPiCodeFirstTranslations/obj/
 Creuna.EPiCodeFirstTranslations/Creuna.BuildTools/msbuildparams.xml
 *.suo
+Creuna.EPiCodeFirstTranslations.KeyBuilder.Tests/bin/
+Creuna.EPiCodeFirstTranslations.KeyBuilder/bin/
+Creuna.EPiCodeFirstTranslations.KeyBuilder/obj/
+Creuna.EPiCodeFirstTranslations.KeyBuilder.Tests/obj/
+*.log
+*.user

@@ -269,6 +269,7 @@
   <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
   <ItemGroup>
+    <Compile Include="App_Start\EPiCodeFirstTranslationConfigurationModule.cs" />
     <Compile Include="Controllers\FrontController.cs" />
     <Compile Include="Enums\Gender.cs" />
     <Compile Include="Global.asax.cs">
@@ -359,6 +360,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Creuna.EPiCodeFirstTranslations.KeyBuilder\Creuna.EPiCodeFirstTranslations.KeyBuilder.csproj">
+      <Project>{D9D5521A-EAC9-44CD-A153-DF31073B8430}</Project>
+      <Name>Creuna.EPiCodeFirstTranslations.KeyBuilder</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Creuna.EPiCodeFirstTranslations\Creuna.EPiCodeFirstTranslations.csproj">
       <Project>{1EBA176F-EA25-4EF7-8364-D2C33C292E06}</Project>
       <Name>Creuna.EPiCodeFirstTranslations</Name>
