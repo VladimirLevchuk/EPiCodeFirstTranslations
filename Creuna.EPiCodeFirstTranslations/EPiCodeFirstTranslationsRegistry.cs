@@ -9,7 +9,6 @@ namespace Creuna.EPiCodeFirstTranslations
         {
             For<ITranslationsKeyMapper>().Singleton().Use<TranslationsKeyMapper>();
             For<IEnumRegistry>().Singleton().Use<EnumRegistry>();
-            For<IEnumRegistry>().Singleton().Use<EnumRegistry>();
 
             For<ITranslationProvider>().Use<TranslationProvider>();
         }

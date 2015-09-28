@@ -106,6 +106,7 @@ namespace Creuna.EPiCodeFirstTranslations
             return EnumRegistry.GetTranslatableEnumTypeRegistrations();
         }
 
+        [Obsolete("Inject EnumRegistry instead")]
         public virtual void RegisterEnumsAsTranslatable(IEnumerable<EnumRegistration> registrations)
         {
             foreach (var registration in registrations)

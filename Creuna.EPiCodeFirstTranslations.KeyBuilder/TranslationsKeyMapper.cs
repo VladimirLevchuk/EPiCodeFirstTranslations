@@ -153,6 +153,10 @@ namespace Creuna.EPiCodeFirstTranslations.KeyBuilder
                 foreach (var propertyKey in propertyTranslationKeys)
                 {
                     var translationKey = PrepareTranslationKey(propertyKey);
+                    if (translationKeyToPropertyPathMap.ContainsKey(translationKey))
+                    {
+                        throw new InvalidOperationException(string.Format("Duplicate key: '{0}'", translationKey ));
+                    }
                     translationKeyToPropertyPathMap.Add(translationKey, propertyPath);
                 }
 

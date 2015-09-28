@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using Creuna.EPiCodeFirstTranslations.KeyBuilder;
+using Creuna.EPiCodeFirstTranslations.Presentation.Enums;
 using Creuna.EPiCodeFirstTranslations.Presentation.Translation;
 using EPiServer.Framework;
 using EPiServer.Framework.Initialization;
@@ -36,6 +38,16 @@ namespace Creuna.EPiCodeFirstTranslations.Presentation.App_Start
         {
             For<TranslationService>().Singleton().Use<TranslationService>();
             For<ITranslationService>().Singleton().Use(ctx => ctx.GetInstance<TranslationService>());
+
+
+            var translatableEnums = new EnumRegistry();
+
+            translatableEnums.Add<Gender>();
+            translatableEnums.Add<Enums2.Gender>();
+            translatableEnums.Add<Position>();
+            translatableEnums.Add<Season>();
+
+            For<IEnumRegistry>().Singleton().Use(translatableEnums);
         }
     }
 }
