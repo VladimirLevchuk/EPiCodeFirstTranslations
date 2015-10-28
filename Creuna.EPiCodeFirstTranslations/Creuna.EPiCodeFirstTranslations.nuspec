@@ -11,7 +11,7 @@
     <iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl>-->
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>First release.</releaseNotes>
+    <releaseNotes>Target EpiServer version was updated to 9.2.1, target framework version was updated to 4.5.1</releaseNotes>
     <copyright>Copyright 2014</copyright>
     <tags>EPiServer Localization Translation Resources</tags>
   </metadata>
