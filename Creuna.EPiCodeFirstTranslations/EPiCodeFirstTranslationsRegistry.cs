@@ -27,9 +27,9 @@ namespace Creuna.EPiCodeFirstTranslations
     {
         public EPiCodeFirstTranslationServiceRegistry()
         {
-            For<TTranslationService>().Singleton().Use<TTranslationService>();
-            For<ITranslationService>().Singleton().Use(ctx => ctx.GetInstance<TTranslationService>());
-            For<ITranslationService<TTranslations>>().Singleton().Use(ctx => ctx.GetInstance<TTranslationService>());
+            For<ITranslationService<TTranslations>>().Singleton().Use<TTranslationService>();
+            Forward<ITranslationService<TTranslations>, TTranslationService>();
+            Forward<ITranslationService<TTranslations>, ITranslationService>();
         }
     }
 }

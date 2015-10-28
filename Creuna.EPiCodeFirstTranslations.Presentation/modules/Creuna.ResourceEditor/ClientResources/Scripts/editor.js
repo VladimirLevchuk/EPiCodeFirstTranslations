@@ -160,6 +160,8 @@
         self.fromLangKey = ko.observable(data.FromLangKey);
         self.toLangKey = ko.observable(data.ToLangKey);
         self.from = ko.observable(data.From);
+        self.fromTranslated = ko.observable(data.FromTranslated);
+        self.fromCodeFirst = ko.observable(data.FromCodeFirst);
         self.isOverridden = ko.observable(data.IsOverridden);
         self.disableSave = ko.observable(false);
 
