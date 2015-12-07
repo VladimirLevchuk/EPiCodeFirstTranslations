@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using Creuna.EPiCodeFirstTranslations.KeyBuilder.Annotation;
+using Creuna.EPiCodeFirstTranslations.KeyBuilder.Extensions;
 
 namespace Creuna.EPiCodeFirstTranslations.KeyBuilder
 {
@@ -176,7 +177,8 @@ namespace Creuna.EPiCodeFirstTranslations.KeyBuilder
 
                 if (keyList.Count > 0)
                 {
-                    propertyPathToTranslationKeyMap[propertyPath] = PrepareTranslationKey(keyList.First());
+                    propertyPathToTranslationKeyMap.Add(propertyPath, PrepareTranslationKey(keyList.First()));
+                    //propertyPathToTranslationKeyMap[propertyPath] = PrepareTranslationKey(keyList.First());
                 }
             }
 
@@ -297,6 +299,17 @@ namespace Creuna.EPiCodeFirstTranslations.KeyBuilder
         {
             var handler = DuplicateKeyFound;
             if (handler != null) handler(this, e);
+        }
+
+        public override string ToString()
+        {
+            var dump = new TranslationKeyMapperDump
+            {
+                PropertyPathToTranslationKeyMaps = _propertyPathToTranslationKeyMaps.OrEmpty(),
+                TranslationKeyToPropertyPathMaps = _translationKeyToPropertyPathMaps.OrEmpty()
+            };
+
+            return dump.ToJsonString();
         }
     }
 }

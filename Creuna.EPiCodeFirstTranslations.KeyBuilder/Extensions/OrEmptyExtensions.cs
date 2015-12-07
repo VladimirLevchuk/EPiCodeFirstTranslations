@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Creuna.EPiCodeFirstTranslations.KeyBuilder
+namespace Creuna.EPiCodeFirstTranslations.KeyBuilder.Extensions
 {
     public static class OrEmptyExtensions
     {
