@@ -9,6 +9,6 @@ namespace Creuna.EPiCodeFirstTranslations.KeyBuilder
 
         string GetTranslationKey(Type translationContentType, string propertyPath, string alias = null);
 
-        Dictionary<string, string> QueryTranslationKeyToPropertyPathMap(Type translationContentType, string propertyPath, string alias = null);
+        Dictionary<string, string> QueryTranslationKeyToPropertyPathMap(Type translationContentType, string translationKey, string alias = null);
     }
 }

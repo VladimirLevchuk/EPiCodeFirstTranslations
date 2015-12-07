@@ -42,7 +42,7 @@ namespace Creuna.EPiCodeFirstTranslations.KeyBuilder.Extensions
                 var result = JsonConvert.DeserializeObject<T>(json, settings);
                 return result;
             }
-            catch (Exception ex)
+            catch (Exception /*ex*/)
             {
                 return null;
             }

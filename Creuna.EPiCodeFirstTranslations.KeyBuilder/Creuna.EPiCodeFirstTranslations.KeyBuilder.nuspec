@@ -11,7 +11,9 @@
     <iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl>-->
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Introduced a package without reference to EPiServer</releaseNotes>
+    <releaseNotes>
+      2.0.1 Duplicate keys error fixed
+      2.0.0 Introduced a package without reference to EPiServer</releaseNotes>
     <copyright>Copyright 2015</copyright>
     <tags>Code-First Localization Translation Resources</tags>
   </metadata>

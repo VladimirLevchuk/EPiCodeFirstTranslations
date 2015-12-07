@@ -8,7 +8,6 @@ using Creuna.EPiCodeFirstTranslations.KeyBuilder.Extensions;
 
 namespace Creuna.EPiCodeFirstTranslations.KeyBuilder
 {
-
     public class TranslationsKeyMapper : ITranslationsKeyMapper
     {
         private const string RootedKeyStart = "~/";
@@ -113,8 +112,8 @@ namespace Creuna.EPiCodeFirstTranslations.KeyBuilder
                 FetchContentTranslationKeys(translationKeyToPropertyPathMap, propertyPathToTranslationKeyMap, contentType, rootTranslationPaths, string.Empty);
             }
 
-            _translationKeyToPropertyPathMaps.Add(contentType, translationKeyToPropertyPathMap);
-            _propertyPathToTranslationKeyMaps.Add(contentType, propertyPathToTranslationKeyMap);
+            _translationKeyToPropertyPathMaps[contentType] = translationKeyToPropertyPathMap;
+            _propertyPathToTranslationKeyMaps[contentType] = propertyPathToTranslationKeyMap;
         }
 
         protected virtual void FetchEnumTranslationKeys(Dictionary<string, string> translationKeyToPropertyPathMap, Dictionary<string, string> propertyPathToTranslationKeyMap, Type enumType, string enumTypeAlias)
@@ -126,8 +125,8 @@ namespace Creuna.EPiCodeFirstTranslations.KeyBuilder
                 {
                     string propertyPath = enumField.Name;
                     string translationKey = string.Format("/Enums/{0}/{1}", enumTypeAlias ?? enumType.Name, propertyPath);
-                    translationKeyToPropertyPathMap.Add(translationKey, propertyPath);
-                    propertyPathToTranslationKeyMap.Add(propertyPath, translationKey);
+                    translationKeyToPropertyPathMap[translationKey] = propertyPath;
+                    propertyPathToTranslationKeyMap[propertyPath] = translationKey;
                 }
             }
         }
@@ -143,13 +142,13 @@ namespace Creuna.EPiCodeFirstTranslations.KeyBuilder
                 return;
             }
 
-            // var processedProperties = new HashSet<string>();
+            var processedTypes = new HashSet<Type>();
 
             var localContentTranslationPaths = GetTranslationPaths(contentType);
             var currentContentTranslationPaths = BuildKeyPaths(parentTranslationPaths, localContentTranslationPaths).ToList();
 
             var translationProps = GetTranslationProperties(contentType).ToList();
-            // processedProperties.Add(translationProps.Select(x => x.PropertyType.FullName, ));
+             processedTypes.Add(contentType);
 
             foreach (var translationProp in translationProps)
             {
@@ -177,18 +176,17 @@ namespace Creuna.EPiCodeFirstTranslations.KeyBuilder
 
                 if (keyList.Count > 0)
                 {
-                    propertyPathToTranslationKeyMap.Add(propertyPath, PrepareTranslationKey(keyList.First()));
-                    //propertyPathToTranslationKeyMap[propertyPath] = PrepareTranslationKey(keyList.First());
+                    propertyPathToTranslationKeyMap[propertyPath] = PrepareTranslationKey(keyList.First());
                 }
             }
 
             var childContentTypeProps = GetChildTranslationContentTypeProperties(contentType);
             foreach (var childContentTypeProp in childContentTypeProps)
             {
-                //if (processedProperties.Contains(childContentTypeProp.PropertyType))
-                //    continue;
+                if (processedTypes.Contains(childContentTypeProp.PropertyType))
+                    continue;
 
-                //processedProperties.Add(childContentTypeProp.PropertyType);
+                processedTypes.Add(childContentTypeProp.PropertyType);
 
                 FetchContentTranslationKeys(translationKeyToPropertyPathMap, propertyPathToTranslationKeyMap, 
                     childContentTypeProp.PropertyType, currentContentTranslationPaths, 

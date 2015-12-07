@@ -61,6 +61,7 @@
     <Compile Include="TranslationsKeyMapper.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Creuna.EPiCodeFirstTranslations.KeyBuilder.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
