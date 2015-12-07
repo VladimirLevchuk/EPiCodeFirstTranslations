@@ -7,6 +7,7 @@ using Creuna.EPiCodeFirstTranslations.KeyBuilder.Annotation;
 
 namespace Creuna.EPiCodeFirstTranslations.KeyBuilder
 {
+
     public class TranslationsKeyMapper : ITranslationsKeyMapper
     {
         private const string RootedKeyStart = "~/";
@@ -15,6 +16,8 @@ namespace Creuna.EPiCodeFirstTranslations.KeyBuilder
 
         private readonly Dictionary<Type, Dictionary<string, string>> _propertyPathToTranslationKeyMaps = new Dictionary<Type, Dictionary<string, string>>();
         private readonly Dictionary<Type, Dictionary<string, string>> _translationKeyToPropertyPathMaps = new Dictionary<Type, Dictionary<string, string>>();
+
+        public event EventHandler<DuplicateKeyEventArg> DuplicateKeyFound;
 
         public virtual Dictionary<string, string> QueryTranslationKeyToPropertyPathMap(Type translationContentType, string translationKey, string translationContentAlias = null)
         {
@@ -139,34 +142,52 @@ namespace Creuna.EPiCodeFirstTranslations.KeyBuilder
                 return;
             }
 
+            // var processedProperties = new HashSet<string>();
+
             var localContentTranslationPaths = GetTranslationPaths(contentType);
             var currentContentTranslationPaths = BuildKeyPaths(parentTranslationPaths, localContentTranslationPaths).ToList();
 
-            var translationProps = GetTranslationProperties(contentType);
+            var translationProps = GetTranslationProperties(contentType).ToList();
+            // processedProperties.Add(translationProps.Select(x => x.PropertyType.FullName, ));
+
             foreach (var translationProp in translationProps)
             {
                 var propertyTranslationKeys = GetTranslationPropertyKeys(translationProp);
-                propertyTranslationKeys = BuildKeyPaths(currentContentTranslationPaths, propertyTranslationKeys);
+                var keyList = BuildKeyPaths(currentContentTranslationPaths, propertyTranslationKeys).ToList();
                 var propertyPath = CombineTypePropertyPath(contentTypePath, translationProp.Name);
 
-                // ReSharper disable PossibleMultipleEnumeration
-                foreach (var propertyKey in propertyTranslationKeys)
+                foreach (var propertyKey in keyList)
                 {
                     var translationKey = PrepareTranslationKey(propertyKey);
+                    
                     if (translationKeyToPropertyPathMap.ContainsKey(translationKey))
                     {
-                        throw new InvalidOperationException(string.Format("Duplicate key: '{0}'", translationKey ));
+                        var e = new DuplicateKeyEventArg
+                        {
+                            TranslationKeyToPropertyPathMap = translationKeyToPropertyPathMap.OrEmpty(),
+                            PropertyPathToTranslationKeyMap = propertyPathToTranslationKeyMap.OrEmpty(),
+                            TranslationKey = translationKey,
+                            PropertyKey = propertyKey
+                        };
+                        OnDuplicateKeyFound(e);
                     }
-                    translationKeyToPropertyPathMap.Add(translationKey, propertyPath);
+                    translationKeyToPropertyPathMap[translationKey] = propertyPath;
                 }
 
-                propertyPathToTranslationKeyMap.Add(propertyPath, PrepareTranslationKey(propertyTranslationKeys.First()));
-                // ReSharper restore PossibleMultipleEnumeration
+                if (keyList.Count > 0)
+                {
+                    propertyPathToTranslationKeyMap[propertyPath] = PrepareTranslationKey(keyList.First());
+                }
             }
 
             var childContentTypeProps = GetChildTranslationContentTypeProperties(contentType);
             foreach (var childContentTypeProp in childContentTypeProps)
             {
+                //if (processedProperties.Contains(childContentTypeProp.PropertyType))
+                //    continue;
+
+                //processedProperties.Add(childContentTypeProp.PropertyType);
+
                 FetchContentTranslationKeys(translationKeyToPropertyPathMap, propertyPathToTranslationKeyMap, 
                     childContentTypeProp.PropertyType, currentContentTranslationPaths, 
                     CombineTypePropertyPath(contentTypePath, childContentTypeProp.Name));
@@ -270,6 +291,12 @@ namespace Creuna.EPiCodeFirstTranslations.KeyBuilder
             return contentType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
                 .Where(p => p.CanRead && p.PropertyType == typeof(string))
                 .ToList();
+        }
+
+        protected virtual void OnDuplicateKeyFound(DuplicateKeyEventArg e)
+        {
+            var handler = DuplicateKeyFound;
+            if (handler != null) handler(this, e);
         }
     }
 }

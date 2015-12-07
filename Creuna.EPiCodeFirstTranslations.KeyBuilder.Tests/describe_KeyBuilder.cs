@@ -23,6 +23,16 @@ namespace Creuna.EPiCodeFirstTranslations.KeyBuilder.Tests
             it["it allows to override path using absolute path (prefixed with ~) with TranslationPath attribute"] = () => translationsKeyBuilder.GetTranslationKey(x => x.Texts.Text1).Should().Be("/my-texts/Text1");
         }
 
+        //void when_same_type_used_for_different_members()
+        //{
+        //    TranslationKeyBuilder<Translations> translationsKeyBuilder = null;
+
+        //    before = () => translationsKeyBuilder = new TranslationKeyBuilder<Translations>(_mapper);
+
+        //    it["works"] = () => translationsKeyBuilder.GetTranslationKey(x => x.AlternateLabels.Label1).Should().Be("/AlternateLabels/Label1");
+        //    // it["works for type with custom translation type"] = () => translationsKeyBuilder.GetTranslationKey(x => x.AlternateMessages.Message1).Should().Be("/AlternateLabels/Label1");
+        //}
+
         void when_inherited_attributes_used()
         {
             TranslationKeyBuilder<Translations> translationsKeyBuilder = null;

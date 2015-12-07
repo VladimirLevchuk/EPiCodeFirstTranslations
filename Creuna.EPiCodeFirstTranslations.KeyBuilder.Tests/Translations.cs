@@ -11,6 +11,7 @@ namespace Creuna.EPiCodeFirstTranslations.KeyBuilder.Tests
             Errors = new Errors();
             Labels = new Labels();
             Texts = new Texts();
+            AlternateLabels = new AlternateLabels();
         }
 
         public Texts Texts { get; private set; }
@@ -18,6 +19,8 @@ namespace Creuna.EPiCodeFirstTranslations.KeyBuilder.Tests
         public Labels Labels { get; private set; }
         public Errors Errors { get; private set; }
         public Messages Messages { get; private set; }
+
+        public Labels AlternateLabels { get; private set; }
         
         public string Text1 { get { return "Text1"; } }
         public string Text2 { get { return "Text2"; } }
@@ -44,6 +47,11 @@ namespace Creuna.EPiCodeFirstTranslations.KeyBuilder.Tests
 
         public string Label1 { get { return "Label1"; } }
         public NestedLabels NestedLabels { get; private set; }
+    }
+
+    [TranslationPath("~/AlternateLabels")]
+    public class AlternateLabels : Labels
+    {
     }
 
     [TranslationPath("~/Labels/NestedLabels")]
