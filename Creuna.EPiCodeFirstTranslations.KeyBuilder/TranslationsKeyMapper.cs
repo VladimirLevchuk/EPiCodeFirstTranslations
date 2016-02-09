@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using Creuna.EPiCodeFirstTranslations.KeyBuilder.Annotation;
+using Creuna.EPiCodeFirstTranslations.KeyBuilder.Extensions;
 
 namespace Creuna.EPiCodeFirstTranslations.KeyBuilder
 {
@@ -15,6 +16,8 @@ namespace Creuna.EPiCodeFirstTranslations.KeyBuilder
 
         private readonly Dictionary<Type, Dictionary<string, string>> _propertyPathToTranslationKeyMaps = new Dictionary<Type, Dictionary<string, string>>();
         private readonly Dictionary<Type, Dictionary<string, string>> _translationKeyToPropertyPathMaps = new Dictionary<Type, Dictionary<string, string>>();
+
+        public event EventHandler<DuplicateKeyEventArg> DuplicateKeyFound;
 
         public virtual Dictionary<string, string> QueryTranslationKeyToPropertyPathMap(Type translationContentType, string translationKey, string translationContentAlias = null)
         {
@@ -109,8 +112,8 @@ namespace Creuna.EPiCodeFirstTranslations.KeyBuilder
                 FetchContentTranslationKeys(translationKeyToPropertyPathMap, propertyPathToTranslationKeyMap, contentType, rootTranslationPaths, string.Empty);
             }
 
-            _translationKeyToPropertyPathMaps.Add(contentType, translationKeyToPropertyPathMap);
-            _propertyPathToTranslationKeyMaps.Add(contentType, propertyPathToTranslationKeyMap);
+            _translationKeyToPropertyPathMaps[contentType] = translationKeyToPropertyPathMap;
+            _propertyPathToTranslationKeyMaps[contentType] = propertyPathToTranslationKeyMap;
         }
 
         protected virtual void FetchEnumTranslationKeys(Dictionary<string, string> translationKeyToPropertyPathMap, Dictionary<string, string> propertyPathToTranslationKeyMap, Type enumType, string enumTypeAlias)
@@ -122,8 +125,8 @@ namespace Creuna.EPiCodeFirstTranslations.KeyBuilder
                 {
                     string propertyPath = enumField.Name;
                     string translationKey = string.Format("/Enums/{0}/{1}", enumTypeAlias ?? enumType.Name, propertyPath);
-                    translationKeyToPropertyPathMap.Add(translationKey, propertyPath);
-                    propertyPathToTranslationKeyMap.Add(propertyPath, translationKey);
+                    translationKeyToPropertyPathMap[translationKey] = propertyPath;
+                    propertyPathToTranslationKeyMap[propertyPath] = translationKey;
                 }
             }
         }
@@ -139,34 +142,52 @@ namespace Creuna.EPiCodeFirstTranslations.KeyBuilder
                 return;
             }
 
+            var processedTypes = new HashSet<Type>();
+
             var localContentTranslationPaths = GetTranslationPaths(contentType);
             var currentContentTranslationPaths = BuildKeyPaths(parentTranslationPaths, localContentTranslationPaths).ToList();
 
-            var translationProps = GetTranslationProperties(contentType);
+            var translationProps = GetTranslationProperties(contentType).ToList();
+             processedTypes.Add(contentType);
+
             foreach (var translationProp in translationProps)
             {
                 var propertyTranslationKeys = GetTranslationPropertyKeys(translationProp);
-                propertyTranslationKeys = BuildKeyPaths(currentContentTranslationPaths, propertyTranslationKeys);
+                var keyList = BuildKeyPaths(currentContentTranslationPaths, propertyTranslationKeys).ToList();
                 var propertyPath = CombineTypePropertyPath(contentTypePath, translationProp.Name);
 
-                // ReSharper disable PossibleMultipleEnumeration
-                foreach (var propertyKey in propertyTranslationKeys)
+                foreach (var propertyKey in keyList)
                 {
                     var translationKey = PrepareTranslationKey(propertyKey);
+                    
                     if (translationKeyToPropertyPathMap.ContainsKey(translationKey))
                     {
-                        throw new InvalidOperationException(string.Format("Duplicate key: '{0}'", translationKey ));
+                        var e = new DuplicateKeyEventArg
+                        {
+                            TranslationKeyToPropertyPathMap = translationKeyToPropertyPathMap.OrEmpty(),
+                            PropertyPathToTranslationKeyMap = propertyPathToTranslationKeyMap.OrEmpty(),
+                            TranslationKey = translationKey,
+                            PropertyKey = propertyKey
+                        };
+                        OnDuplicateKeyFound(e);
                     }
-                    translationKeyToPropertyPathMap.Add(translationKey, propertyPath);
+                    translationKeyToPropertyPathMap[translationKey] = propertyPath;
                 }
 
-                propertyPathToTranslationKeyMap.Add(propertyPath, PrepareTranslationKey(propertyTranslationKeys.First()));
-                // ReSharper restore PossibleMultipleEnumeration
+                if (keyList.Count > 0)
+                {
+                    propertyPathToTranslationKeyMap[propertyPath] = PrepareTranslationKey(keyList.First());
+                }
             }
 
             var childContentTypeProps = GetChildTranslationContentTypeProperties(contentType);
             foreach (var childContentTypeProp in childContentTypeProps)
             {
+                if (processedTypes.Contains(childContentTypeProp.PropertyType))
+                    continue;
+
+                processedTypes.Add(childContentTypeProp.PropertyType);
+
                 FetchContentTranslationKeys(translationKeyToPropertyPathMap, propertyPathToTranslationKeyMap, 
                     childContentTypeProp.PropertyType, currentContentTranslationPaths, 
                     CombineTypePropertyPath(contentTypePath, childContentTypeProp.Name));
@@ -270,6 +291,23 @@ namespace Creuna.EPiCodeFirstTranslations.KeyBuilder
             return contentType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
                 .Where(p => p.CanRead && p.PropertyType == typeof(string))
                 .ToList();
+        }
+
+        protected virtual void OnDuplicateKeyFound(DuplicateKeyEventArg e)
+        {
+            var handler = DuplicateKeyFound;
+            if (handler != null) handler(this, e);
+        }
+
+        public override string ToString()
+        {
+            var dump = new TranslationKeyMapperDump
+            {
+                PropertyPathToTranslationKeyMaps = _propertyPathToTranslationKeyMaps.OrEmpty(),
+                TranslationKeyToPropertyPathMaps = _translationKeyToPropertyPathMaps.OrEmpty()
+            };
+
+            return dump.ToJsonString();
         }
     }
 }
