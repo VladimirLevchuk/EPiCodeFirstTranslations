@@ -37,7 +37,10 @@ namespace Creuna.EPiCodeFirstTranslations.KeyBuilder
 
         public override string ToString()
         {
-            return _keyMapper.ToString();
+            lock (_syncRoot)
+            {
+                return _keyMapper.ToString();
+            }
         }
     }
 }

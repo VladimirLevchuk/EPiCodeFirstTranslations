@@ -12,6 +12,7 @@ namespace Creuna.EPiCodeFirstTranslations.KeyBuilder.Tests
             Labels = new Labels();
             Texts = new Texts();
             AlternateLabels = new AlternateLabels();
+            MoreLabels = new Labels();
         }
 
         public Texts Texts { get; private set; }
@@ -20,7 +21,8 @@ namespace Creuna.EPiCodeFirstTranslations.KeyBuilder.Tests
         public Errors Errors { get; private set; }
         public Messages Messages { get; private set; }
 
-        public Labels AlternateLabels { get; private set; }
+        public AlternateLabels AlternateLabels { get; private set; }
+        public Labels MoreLabels { get; private set; }
         
         public string Text1 { get { return "Text1"; } }
         public string Text2 { get { return "Text2"; } }

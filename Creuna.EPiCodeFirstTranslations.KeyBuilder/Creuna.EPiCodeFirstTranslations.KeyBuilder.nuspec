@@ -12,7 +12,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
     <releaseNotes>
-      2.0.1 Duplicate keys error fixed
+      2.0.1 Duplicate keys error fixed; known issue - it doesn't allow to have several properties of the same type
       2.0.0 Introduced a package without reference to EPiServer</releaseNotes>
     <copyright>Copyright 2015</copyright>
     <tags>Code-First Localization Translation Resources</tags>
