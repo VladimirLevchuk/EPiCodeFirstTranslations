@@ -11,11 +11,15 @@
     <iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl>-->
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Target EpiServer version was updated to 9.2.1, target framework version was updated to 4.5.1</releaseNotes>
-    <copyright>Copyright 2014</copyright>
+    <releaseNotes>
+      3.0.1 - TranslationForCultureAttribute moved to KeyBuilder
+      3.0.0 - Target EpiServer version was updated to 9.2.1, target framework version was updated to 4.5.1
+    </releaseNotes>
+    <copyright>Copyright 2014-2016</copyright>
     <tags>EPiServer Localization Translation Resources</tags>
   </metadata>
   <files>
-	<file src="readme.txt" target="" />
+	  <file src="readme.txt" target="" />
+    <file src="bin\release\Creuna.EPiCodeFirstTranslations.pdb" target="lib\net451" />
   </files>
 </package>

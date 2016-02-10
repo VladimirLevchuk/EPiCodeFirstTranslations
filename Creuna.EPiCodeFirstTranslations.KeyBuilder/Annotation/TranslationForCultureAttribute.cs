@@ -1,7 +1,7 @@
 using System;
 using System.Globalization;
 
-namespace Creuna.EPiCodeFirstTranslations.Attributes
+namespace Creuna.EPiCodeFirstTranslations.KeyBuilder.Annotation
 {
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, Inherited = false, AllowMultiple = true)]
     public class TranslationForCultureAttribute : Attribute

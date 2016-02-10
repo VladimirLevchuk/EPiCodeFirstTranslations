@@ -1,4 +1,5 @@
 ﻿@using Creuna.EPiCodeFirstTranslations.Presentation.Enums
+@using Creuna.ResourceEditor.Helpers
 @using Enums2 = Creuna.EPiCodeFirstTranslations.Presentation.Enums2
 @model Creuna.EPiCodeFirstTranslations.Presentation.ViewModels.Pages.FrontPageViewModel
 
@@ -40,3 +41,8 @@
 <p>Autumn is: "@Html.TranslationForEnumValue(Season.Autumn)"</p>
 <p>Winter is: "@Html.TranslationForEnumValue(Season.Winter)"</p>
 <p>AllYear is: "@Html.TranslationForEnumValue(Season.AllYear)"</p>
+
+@using (new LanguageSwitcher("sv"))
+{
+    <p> SV Season.None is: @Html.TranslationForEnumValue(Season.None) </p>
+}

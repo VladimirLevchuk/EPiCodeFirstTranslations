@@ -1,7 +1,5 @@
 ﻿using System;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using Creuna.EPiCodeFirstTranslations.Attributes;
 using Creuna.EPiCodeFirstTranslations.KeyBuilder.Annotation;
 
 namespace Creuna.EPiCodeFirstTranslations.Presentation.Enums2

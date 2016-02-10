@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace Creuna.EPiCodeFirstTranslations.Attributes
 {
@@ -18,5 +19,14 @@ namespace Creuna.EPiCodeFirstTranslations.Attributes
         public TranslationKeyAttribute(string key) : base(key)
         {
         }
+    }
+
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, Inherited = false, AllowMultiple = true)]
+    [Obsolete("Use Creuna.EPiCodeFirstTranslations.KeyBuilder.Annotation.AlsoTranslationForKeyAttribute instead")]
+    public sealed class TranslationForCultureAttribute : KeyBuilder.Annotation.TranslationForCultureAttribute
+    {
+        public TranslationForCultureAttribute(string cultureName, string translation)
+            : base(cultureName, translation)
+        {}
     }
 }

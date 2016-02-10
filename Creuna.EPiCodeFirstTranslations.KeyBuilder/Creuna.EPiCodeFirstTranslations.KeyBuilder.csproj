@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Annotation\AlsoTranslationForKeyAttribute.cs" />
+    <Compile Include="Annotation\TranslationForCultureAttribute.cs" />
     <Compile Include="Annotation\TranslationPathAttribute.cs" />
     <Compile Include="DuplicateKeyEventArg.cs" />
     <Compile Include="EnumRegistration.cs" />

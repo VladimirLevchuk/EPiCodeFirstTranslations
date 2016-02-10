@@ -12,3 +12,4 @@ Creuna.EPiCodeFirstTranslations.KeyBuilder.Tests/obj/
 *.log
 *.user
 *.nupkg
+.vs/config/applicationhost.config
