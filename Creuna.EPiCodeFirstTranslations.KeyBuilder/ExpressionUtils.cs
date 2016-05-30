@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text;
+using JetBrains.Annotations;
 
 namespace Creuna.EPiCodeFirstTranslations
 {
     /// <summary>
-    /// Contains the utile methods that help to get required information form LINQ expression instance.
+    /// Contains the utility methods that help to get required information form LINQ expression instance.
     /// </summary>
-    internal static class ExpressionUtils
+    public static class ExpressionUtils
     {
         /// <summary>
         /// Gets the <see cref="PropertyInfo"/> instance of defined by LINQ expression property.
@@ -18,7 +21,7 @@ namespace Creuna.EPiCodeFirstTranslations
         /// <returns>
         /// The specified <see cref="PropertyInfo"/> instance.
         /// </returns>
-        public static PropertyInfo GetPropertyInfo<T>(Expression<Func<T, object>> propertyExpression)
+        public static PropertyInfo GetPropertyInfo<T>([NotNull] Expression<Func<T, object>> propertyExpression)
         {
             return GetPropertyInfo<T, object>(propertyExpression);
         }
@@ -32,7 +35,7 @@ namespace Creuna.EPiCodeFirstTranslations
         /// <returns>
         /// The specified <see cref="PropertyInfo"/> instance.
         /// </returns>
-        public static PropertyInfo GetPropertyInfo<T, TValue>(Expression<Func<T, TValue>> propertyExpression)
+        public static PropertyInfo GetPropertyInfo<T, TValue>([NotNull] Expression<Func<T, TValue>> propertyExpression)
         {
             const string propertyExpressionParamName = "propertyExpression";
 
@@ -63,6 +66,38 @@ namespace Creuna.EPiCodeFirstTranslations
             return property;
         }
 
+        [NotNull]
+        public static PropertyInfo GetPropertyInfo([NotNull] Type type, [NotNull] IEnumerable<string> path)
+        {
+            if (type == null) throw new ArgumentNullException(nameof(type));
+            if (path == null) throw new ArgumentNullException(nameof(path));
+
+            PropertyInfo property = null;
+            var currentType = type;
+            var currentPath = new StringBuilder(type.FullName);
+
+            foreach (var currentProperty in path)
+            {
+                currentPath.AppendFormat(".{0}", currentProperty);
+                property = currentType.GetProperty(currentProperty);
+
+                if (property == null)
+                {
+                    throw new InvalidOperationException(
+                        $"Property not found, Path: '{currentPath}', current type: '{currentType}'");
+                }
+
+                currentType = property.PropertyType;
+            }
+
+            if (property == null)
+            {
+                throw new ArgumentException("Path shouldn't be empty", nameof(path));
+            }
+
+            return property;
+        }
+
         /// <summary>
         /// Converts the defined LINQ expression to <see cref="string"/> representation of the path to the specified property.
         /// </summary>
@@ -71,9 +106,9 @@ namespace Creuna.EPiCodeFirstTranslations
         /// <returns>
         /// The path to the specified property.
         /// </returns>
-        public static string GetPropertyPath<T>(Expression<Func<T, object>> propertyPathExpression)
+        public static string GetPropertyPath<T>([NotNull] Expression<Func<T, object>> propertyPathExpression)
         {
-            return GetPropertyPath<T, object>(propertyPathExpression);
+            return GetPropertyPathString<T, object>(propertyPathExpression);
         }
 
         /// <summary>
@@ -85,7 +120,21 @@ namespace Creuna.EPiCodeFirstTranslations
         /// <returns>
         /// The path to the specified property.
         /// </returns>
-        public static string GetPropertyPath<T, TValue>(Expression<Func<T, TValue>> propertyPathExpression)
+        public static string GetPropertyPathString<T, TValue>([NotNull] Expression<Func<T, TValue>> propertyPathExpression)
+        {
+            var path = GetPropertyPath(propertyPathExpression);
+            var result = string.Join(".", path.ToArray());
+            return result;
+        }
+
+
+        public static string GetPropertyPathString(IEnumerable<string> propertyPath)
+        {
+            var result = string.Join(".", propertyPath.ToArray());
+            return result;
+        }
+
+        public static IEnumerable<string> GetPropertyPath<T, TValue>([NotNull] Expression<Func<T, TValue>> propertyPathExpression)
         {
             const string propertyPathExpressionParamName = "propertyExpression";
 
@@ -113,7 +162,7 @@ namespace Creuna.EPiCodeFirstTranslations
                 throw new ArgumentException("Unable to get property path from expression.", propertyPathExpressionParamName);
             }
 
-            return string.Join(".", stack.ToArray());
+            return stack;
         }
     }
 }

@@ -18,6 +18,7 @@ namespace Creuna.EPiCodeFirstTranslations.KeyBuilder.Tests
         public Texts Texts { get; private set; }
 
         public Labels Labels { get; private set; }
+        [TranslationPropertyPath("my-errors")]
         public Errors Errors { get; private set; }
         public Messages Messages { get; private set; }
 
@@ -50,8 +51,8 @@ namespace Creuna.EPiCodeFirstTranslations.KeyBuilder.Tests
         public string Label1 { get { return "Label1"; } }
         public NestedLabels NestedLabels { get; private set; }
     }
-
-    [TranslationPath("~/AlternateLabels")]
+    
+    [TranslationPath("/AlternateLabels")]
     public class AlternateLabels : Labels
     {
     }
@@ -71,14 +72,12 @@ namespace Creuna.EPiCodeFirstTranslations.KeyBuilder.Tests
         public string Text2 { get { return "Text2"; }}
     }
 
-    [TranslationPath("my-errors")]
     public class Errors
     {
         public string Error1 { get { return "Error1"; } }
 
         public string Error2 { get { return "Error2"; } }
 
-        [AlsoTranslationForKey("/custom-key/error-3")]
         public string Error3 { get { return "Error3"; } }
     }
 
@@ -103,5 +102,14 @@ namespace Creuna.EPiCodeFirstTranslations.KeyBuilder.Tests
 
         [InheritedAlsoTranslationForKey("/inherited-key/text-2")]
         public string Message2 { get { return "Message2"; }}
+    }
+
+    namespace Nested
+    {
+        public enum MyEnum
+        {
+            EnumValue1,
+            EnumValue2
+        }
     }
 }
