@@ -12,7 +12,7 @@ namespace Creuna.EPiCodeFirstTranslations
     public abstract class TranslationServiceBase<TTranslationContent> : ITranslationService<TTranslationContent>
     {
         private readonly Lazy<LocalizationService> _localizationService = new Lazy<LocalizationService>(ServiceLocator.Current.GetInstance<LocalizationService>);
-        private readonly Lazy<ITranslationsKeyMapper> _translationKeyMapper = new Lazy<ITranslationsKeyMapper>(ServiceLocator.Current.GetInstance<ITranslationsKeyMapper>);
+        // private readonly Lazy<ITranslationsKeyMapper> _translationKeyMapper = new Lazy<ITranslationsKeyMapper>(ServiceLocator.Current.GetInstance<ITranslationsKeyMapper>);
         private readonly Lazy<ITranslationKeyBuilder<TTranslationContent>> _translationKeyBuilder = new Lazy<ITranslationKeyBuilder<TTranslationContent>>(ServiceLocator.Current.GetInstance<ITranslationKeyBuilder<TTranslationContent>>);
 
         private readonly Lazy<TTranslationContent> _translations = new Lazy<TTranslationContent>(ServiceLocator.Current.GetInstance<TTranslationContent>);
@@ -20,7 +20,7 @@ namespace Creuna.EPiCodeFirstTranslations
 
         protected virtual LocalizationService LocalizationService { get { return _localizationService.Value; } }
 
-        protected virtual ITranslationsKeyMapper TranslationsKeyMapper { get { return _translationKeyMapper.Value; } }
+        // protected virtual ITranslationsKeyMapper TranslationsKeyMapper { get { return _translationKeyMapper.Value; } }
         protected virtual ITranslationKeyBuilder<TTranslationContent> TranslationsKeyBuilder { get { return _translationKeyBuilder.Value; } }
 
         protected virtual IEnumRegistry EnumRegistry { get { return _enumRegistry.Value; } }
@@ -91,14 +91,7 @@ namespace Creuna.EPiCodeFirstTranslations
 
         public virtual string GetEnumTranslationKey(Enum item)
         {
-            var enumRegistration = EnumRegistry.TryGetEnumRegistration(item.GetType());
-            
-            if (enumRegistration == null)
-            {
-                throw new InvalidOperationException("This type of enum is not registered to be translated.");
-            }
-
-            return TranslationsKeyMapper.GetTranslationKey(enumRegistration.EnumType, item.ToString(), enumRegistration.Alias);
+            return TranslationsKeyBuilder.GetEnumTranslationKey(item);
         }
 
         public virtual IEnumerable<EnumRegistration> GetTranslatableEnumTypeRegistrations()

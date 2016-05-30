@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace Creuna.EPiCodeFirstTranslations.KeyBuilder
@@ -16,12 +17,23 @@ namespace Creuna.EPiCodeFirstTranslations.KeyBuilder
 
         public virtual string GetTranslationKey(Expression<Func<TTranslationContent, string>> translationPath)
         {
+            var propertyPathString = ExpressionUtils.GetPropertyPathString(translationPath);
+            return GetTranslationKey(propertyPathString);
+        }
+
+        protected virtual string GetTranslationKey(string propertyPathString)
+        {
             lock (_syncRoot)
             {
-                var propertyPath = ExpressionUtils.GetPropertyPath(translationPath);
-                var translationKey = _keyMapper.GetTranslationKey(typeof (TTranslationContent), propertyPath);
+                var translationKey = _keyMapper.GetTranslationKey(typeof(TTranslationContent), propertyPathString);
                 return translationKey;
             }
+        }
+
+        public virtual string GetTranslationKey(IEnumerable<string> propertyPath)
+        {
+            var propertyPathString = ExpressionUtils.GetPropertyPathString(propertyPath);
+            return GetTranslationKey(propertyPathString);
         }
 
         public virtual string GetEnumTranslationKey(Enum item, string alias = null)

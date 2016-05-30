@@ -59,10 +59,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DebuggerShim.cs" />
-    <Compile Include="describe_KeyBuilder.cs" />
-    <Compile Include="describe_TranslationkeyMapper.cs" />
-    <Compile Include="KeyBuilder_spec.cs" />
+    <Compile Include="AcceptanceTests\EnumRegistryTranslationMetadataProvider_Tests.cs" />
+    <Compile Include="AcceptanceTests\TranslationAnnotationMetadataProvider_Tests.cs" />
+    <Compile Include="UnitTests\KeyBuilder\EnumRegistryTests.cs" />
+    <Compile Include="UnitTests\KeyBuilder\TranslationPathTests.cs" />
+    <Compile Include="specs\DebuggerShim.cs" />
+    <Compile Include="specs\describe_KeyBuilder.cs" />
+    <Compile Include="specs\describe_KeyResolver.cs" />
+    <Compile Include="specs\describe_TranslationkeyMapper.cs" />
+    <Compile Include="specs\describe_ExpressionUtils.cs" />
+    <Compile Include="specs\KeyBuilder_spec.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Translations.cs" />
   </ItemGroup>

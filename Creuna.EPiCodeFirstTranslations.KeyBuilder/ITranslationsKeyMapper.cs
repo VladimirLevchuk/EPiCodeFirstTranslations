@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace Creuna.EPiCodeFirstTranslations.KeyBuilder
 {
+    [Obsolete("Replaced by ITranslationMetadataProvider, IEnumTranslationMetadataProvider")]
     public interface ITranslationsKeyMapper
     {
         string GetPropertyPathOrEnumValueKey(Type translationContentType, string translationKey, string alias = null);
