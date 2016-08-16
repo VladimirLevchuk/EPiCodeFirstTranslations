@@ -3,7 +3,7 @@
   <episerver.framework>
     <localization>
       <providers>
-        <add name="CodeFirstLocalizationProvider" type="Creuna.EPiCodeFirstTranslations.CodeFirstLocalizationProvider" />
+        <add name="CodeFirstLocalizationProvider" type="Creuna.EPiCodeFirstTranslations.CodeFirstLocalizationProvider, Creuna.EPiCodeFirstTranslations" />
       </providers>
     </localization>
   </episerver.framework>

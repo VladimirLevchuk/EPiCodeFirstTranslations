@@ -12,6 +12,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
     <releaseNotes>
+      3.0.3 - fixed configuration error (NRE) appeared after upgrading to episerver 9.12.0
       3.0.2 - EPiServer downgraded to 9.2.0
       3.0.1 - TranslationForCultureAttribute moved to KeyBuilder
       3.0.0 - Target EpiServer version was updated to 9.2.1, target framework version was updated to 4.5.1

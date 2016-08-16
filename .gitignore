@@ -13,3 +13,7 @@ Creuna.EPiCodeFirstTranslations.KeyBuilder.Tests/obj/
 *.user
 *.nupkg
 .vs/config/applicationhost.config
+Creuna.CodeFirstTranslations.EPiServer/bin/
+Creuna.CodeFirstTranslations/obj/
+Creuna.CodeFirstTranslations.EPiServer/obj/
+Creuna.CodeFirstTranslations/bin/
