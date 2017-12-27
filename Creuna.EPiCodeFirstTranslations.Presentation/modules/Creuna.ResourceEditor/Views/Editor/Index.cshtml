@@ -97,9 +97,12 @@
                                 </div>
                                 <div class="setting-item">
                                     <div class="clear">
-                                        <label for="resurceProviderSelect">@Html.Translate("/resourceEditor/searchPanel/resourceProvider")</label>
+                                        <label>@Html.Translate("/resourceEditor/searchPanel/resourceProviders")</label>
                                     </div>
-                                    <select id="resurceProviderSelect" data-bind="options: resourceProviders,optionsText: 'name', optionsValue: 'key', value: resourceProviderKey"></select>
+                                    <div data-bind="foreach: resourceProviders">
+                                        <label><input type="checkbox" data-bind="value:key, checked: $root.resourceProviderKeys"/><span data-bind="text:name"></span></label>
+                                        <br/>
+                                    </div>
                                 </div>
                             </div>
                         </fieldset>
@@ -195,7 +198,11 @@
                     <div class="box" data-bind="visible: keyFilterApplied">@Html.Translate("/resourceEditor/translations/clientFiltersApplied/key") - "<b data-bind="text: keyFilter"></b>"</div>
                     <div class="box" data-bind="visible: fromFilterApplied">@Html.Translate("/resourceEditor/translations/clientFiltersApplied/from") - "<b data-bind="text: fromFilter"></b>"</div>
                     <div class="box" data-bind="visible: toFilterApplied">@Html.Translate("/resourceEditor/translations/clientFiltersApplied/to") - "<b data-bind="text: toFilter"></b>"</div>
-                    <div class="box" data-bind="visible: defaultProviderKey() != resourceProviderKey()">@Html.Translate("/resourceEditor/translations/clientFiltersApplied/resourceProvider") - "<b data-bind="text: resourceProviderText"></b>"</div>
+                    <div class="box">@Html.Translate("/resourceEditor/translations/clientFiltersApplied/resourceProviders"):
+                        <span data-bind="foreach: resourceProviderKeys">
+                            "<b data-bind="text: $data"></b>"<span data-bind="visible:$index() < ($parent.resourceProviderKeys().length-1)">,</span>
+                        </span> 
+                    </div>
                 </div>
             </div>
             <div class="column2">

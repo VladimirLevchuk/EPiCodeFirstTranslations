@@ -1,6 +1,9 @@
 Creuna.EPiCodeFirstTranslations
 ===============================
 
+NOTE: starting from v4.0.0 EPiCodeFirstTranslationsRegistry is not a part of the package, so you'll need to define it yourself 
+(or setup your IoC container in any other way you prefer)
+
 Configure your IoC before using:
 
     [InitializableModule]
@@ -18,16 +21,29 @@ Configure your IoC before using:
 
         public virtual void ConfigureContainer(ServiceConfigurationContext context)
         {
-            context.Container.Configure(x => x.AddRegistry(new EPiCodeFirstTranslationsRegistry<Translations>()));
-            
+            context.StructureMap().Configure(x => x.AddRegistry<EPiCodeFirstTranslationsRegistry>());
+        }
+    }
+
+	public class EPiCodeFirstTranslationsRegistry : Registry
+    {
+        public EPiCodeFirstTranslationsRegistry()
+        {
+            For<ITranslationsKeyMapper>().Singleton().Use<TranslationsKeyMapper>();
+
             var translatableEnums = new EnumRegistry();
 
             // add your translatable enums here
-            // translatableEnums.Add<Gender>();
-            // translatableEnums.Add<Enums2.Gender>("Gender 2");
+            // i.e. 
+			// translatableEnums.Add<Gender>();
+            For<IEnumRegistry>().Singleton().Use(translatableEnums);
 
-            context.Container.Configure(x => x.For<IEnumRegistry>().Singleton().Use(translatableEnums));
+            For<ITranslationProvider>().Use<TranslationProvider>();
+            For<ITranslationKeyBuilder<Translations>>().Use<TranslationKeyBuilder<Translations>>();
 
-            context.Container.Configure(x => x.AddRegistry(new EPiCodeFirstTranslationServiceRegistry<TranslationService, Translations>()));
+            For<TranslationService>().Singleton().Use<TranslationService>();
+			// do not forget to configure interfaces
+			Forward<TranslationService, ITranslationService>();
+            Forward<TranslationService, ITranslationService<Translations>>();
         }
     }

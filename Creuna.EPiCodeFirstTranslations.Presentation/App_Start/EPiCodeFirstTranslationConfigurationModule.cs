@@ -1,16 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Creuna.EPiCodeFirstTranslations.KeyBuilder;
-using Creuna.EPiCodeFirstTranslations.Presentation.Enums;
-using Creuna.EPiCodeFirstTranslations.Presentation.Translation;
-using EPiServer.Framework;
+﻿using EPiServer.Framework;
 using EPiServer.Framework.Initialization;
 using EPiServer.ServiceLocation;
-using StructureMap.Configuration.DSL;
 
-namespace Creuna.EPiCodeFirstTranslations.Presentation.App_Start
+namespace Creuna.EPiCodeFirstTranslations.Presentation
 {
     [InitializableModule]
     [ModuleDependency(typeof(ServiceContainerInitialization))]
@@ -27,19 +19,7 @@ namespace Creuna.EPiCodeFirstTranslations.Presentation.App_Start
 
         public virtual void ConfigureContainer(ServiceConfigurationContext context)
         {
-            context.Container.Configure(x => x.AddRegistry(new EPiCodeFirstTranslationsRegistry<Translations>()));
-            
-            var translatableEnums = new EnumRegistry();
-
-            // add your translatable enums here
-            translatableEnums.Add<Gender>();
-            translatableEnums.Add<Enums2.Gender>("Gender 2");
-            translatableEnums.Add<Position>();
-            translatableEnums.Add<Season>();
-
-            context.Container.Configure(x => x.For<IEnumRegistry>().Singleton().Use(translatableEnums));
-
-            context.Container.Configure(x => x.AddRegistry(new EPiCodeFirstTranslationServiceRegistry<TranslationService, Translations>()));
+            context.StructureMap().Configure(x => x.AddRegistry<EPiCodeFirstTranslationsRegistry>());
         }
     }
 }
