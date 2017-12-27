@@ -9,12 +9,12 @@ namespace Creuna.EPiCodeFirstTranslations.Presentation.Orchestrators
 {
     public class FrontOrchestrator
     {
-        public FrontOrchestrator(TranslationService translations)
+        public FrontOrchestrator(ITranslationService<Translations> translations)
         {
             Translations = translations;
         }
 
-        protected virtual TranslationService Translations { get; private set; }
+        protected virtual ITranslationService<Translations> Translations { get; private set; }
 
         public FrontPageViewModel GetPageModel()
         {

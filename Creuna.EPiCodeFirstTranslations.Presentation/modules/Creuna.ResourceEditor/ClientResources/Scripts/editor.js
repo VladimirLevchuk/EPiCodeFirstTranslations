@@ -26,6 +26,19 @@
             s4() + '-' + s4() + s4() + s4();
     }
 
+    function arrayToQueryStringParameter(array, parameterName) {
+        var result = "";
+        for (var i = 0; i < array.length; i++) {
+            var value = array[i];
+            result += parameterName + "=" + value;
+            if (i < array.length - 1) {
+                result += "&";
+            }
+        }
+
+        return result;
+    }
+
     function DataController() {
         var self = this;
 
@@ -161,7 +174,7 @@
         self.toLangKey = ko.observable(data.ToLangKey);
         self.from = ko.observable(data.From);
         self.fromTranslated = ko.observable(data.FromTranslated);
-        self.fromCodeFirst = ko.observable(data.FromCodeFirst);
+        self.fromInitial = ko.observable(data.FromInitial);
         self.isOverridden = ko.observable(data.IsOverridden);
         self.disableSave = ko.observable(false);
 
@@ -215,10 +228,8 @@
 
         self.fromLangKey = ko.observable();
         self.toLangKey = ko.observable();
-        self.resourceProviderKey = ko.observable();
-
-        self.defaultProviderKey = ko.observable();
-
+        self.resourceProviderKeys = ko.observableArray([]);
+        
         self.totalTranslationsCount = ko.observable();
         self.loadingTranslations = ko.observable(false);
 
@@ -239,12 +250,6 @@
 
         self.isAdvancedMode = ko.computed(function() {
             return !self.isSimpleMode();
-        });
-
-        self.resourceProviderText = ko.computed(function() {
-            var result = $("#resurceProviderSelect option[value='" + self.resourceProviderKey() + "']").text();
-
-            return result;
         });
 
         self.statusMessage = ko.observable('');
@@ -544,9 +549,7 @@
 
                 self.fromLangKey(loadedSettings.DefaultFrom);
                 self.toLangKey(loadedSettings.DefaultTo);
-
-                self.resourceProviderKey(loadedSettings.DefaultResourceProvider);
-                self.defaultProviderKey(loadedSettings.DefaultResourceProvider);
+                self.resourceProviderKeys(loadedSettings.ResourceProviders);
 
                 self.settingsAreLoaded(true);
             }, self.handleServerError);
@@ -664,9 +667,8 @@
 
         self.performTranslationsLoad = (function() {
             self.loadingTranslations(true);
-
-            var requestUrl = "translations?providerKey=" + self.resourceProviderKey() + "&fromLangKey=" + self.fromLangKey() + "&toLangKey=" + self.toLangKey() + "&page=" + self.pageNumber() + "&pageSize=" + self.pageSize() + "&searchTerm=" + self.searchTerm() + "&hideTranslated=" + self.hideTranslated() + "&overriddenOnly=" + self.showOverriddenOnly() + "&orderBy=" + self.orderBy() + "&orderByIsAscending=" + self.orderByIsAscending();
-
+            var requestUrl = "translations?" + arrayToQueryStringParameter(self.resourceProviderKeys(), "providerKeys") + "&fromLangKey=" + self.fromLangKey() + "&toLangKey=" + self.toLangKey() + "&page=" + self.pageNumber() + "&pageSize=" + self.pageSize() + "&searchTerm=" + self.searchTerm() + "&hideTranslated=" + self.hideTranslated() + "&overriddenOnly=" + self.showOverriddenOnly() + "&orderBy=" + self.orderBy() + "&orderByIsAscending=" + self.orderByIsAscending();
+            
             self.dataController.loadTranslations(requestUrl, function (data) {
 
                     var items = $.map(data.Items, function(dataItem) {

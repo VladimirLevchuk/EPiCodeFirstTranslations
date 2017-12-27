@@ -12,6 +12,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
     <releaseNotes>
+      4.0.0 - EPiServer CMS 11 compatible, removed structuremap dependency, .NET framework updated to v4.6.1
       3.0.3 - fixed configuration error (NRE) appeared after upgrading to episerver 9.12.0
       3.0.2 - EPiServer downgraded to 9.2.0
       3.0.1 - TranslationForCultureAttribute moved to KeyBuilder
@@ -22,6 +23,5 @@
   </metadata>
   <files>
 	  <file src="readme.txt" target="" />
-    <file src="bin\release\Creuna.EPiCodeFirstTranslations.pdb" target="lib\net451" />
   </files>
 </package>
